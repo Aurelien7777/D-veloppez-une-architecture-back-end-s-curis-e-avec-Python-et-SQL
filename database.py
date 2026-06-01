@@ -3,6 +3,7 @@ from sqlalchemy import text
 from dotenv import dotenv_values
 from sqlalchemy.engine import URL
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import sessionmaker
 
 config = dotenv_values(".env")
 
@@ -22,6 +23,12 @@ def get_database_url():
 
 
 engine = create_engine(get_database_url())
+
+SessionLocal = sessionmaker(
+    bind=engine,
+    autoflush=False,
+    autocommit=False,
+)
 
 
 def test_connection_database():
