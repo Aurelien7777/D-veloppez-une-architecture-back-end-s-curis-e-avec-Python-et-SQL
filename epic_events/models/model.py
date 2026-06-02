@@ -42,6 +42,21 @@ class User(Base):
             f"full_name={self.full_name!r}, "
             f"role={self.role!r})"
         )
+    
+    def is_management(self) -> bool:
+        """Return True if user belongs to management role."""
+
+        return self.role.name == "management"
+
+    def is_commercial(self) -> bool:
+        """Return True if user belongs to commercial role."""
+
+        return self.role.name == "commercial"
+
+    def is_support(self) -> bool:
+        """Return True if user belongs to support role."""
+
+        return self.role.name == "support"
 
 
 class Role(Base):

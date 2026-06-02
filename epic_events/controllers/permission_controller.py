@@ -6,19 +6,19 @@ from epic_events.models.model import Contract, Customer, Event, User
 def is_management(user: User) -> bool:
     """Return True if user belongs to management role."""
 
-    return user.role.name == "management"
+    return user.is_management()
 
 
 def is_commercial(user: User) -> bool:
     """Return True if user belongs to commercial role."""
 
-    return user.role.name == "commercial"
+    return user.is_commercial()
 
 
 def is_support(user: User) -> bool:
     """Return True if user belongs to support role."""
 
-    return user.role.name == "support"
+    return user.is_support()
 
 
 def can_manage_users(user: User) -> bool:
@@ -85,3 +85,8 @@ def can_update_event(user: User, event: Event) -> bool:
         return True
 
     return False
+
+def can_delete_customer(user: User) -> bool:
+    """Return True if user can delete customers."""
+
+    return is_management(user)

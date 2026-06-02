@@ -67,9 +67,7 @@ def whoami():
 def main():
     """Run Epic Events CLI."""
 
-    parser = argparse.ArgumentParser(
-        description="Epic Events CRM command line application."
-    )
+    parser = argparse.ArgumentParser(description="Epic Events CRM command line application.")
 
     subparsers = parser.add_subparsers(dest="command", required=True)
 

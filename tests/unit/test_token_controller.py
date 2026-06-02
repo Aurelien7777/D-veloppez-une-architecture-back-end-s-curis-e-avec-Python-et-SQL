@@ -5,7 +5,6 @@ import pytest
 
 from epic_events.controllers import token_controller
 
-
 JWT_SECRET_KEY = "a" * 32
 JWT_ALGORITHM = "HS256"
 
