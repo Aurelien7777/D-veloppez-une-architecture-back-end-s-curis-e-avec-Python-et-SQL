@@ -5,7 +5,7 @@ from argon2.exceptions import VerificationError, VerifyMismatchError
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from models.model import User
+from epic_events.models.model import User
 
 password_hasher = PasswordHasher()
 

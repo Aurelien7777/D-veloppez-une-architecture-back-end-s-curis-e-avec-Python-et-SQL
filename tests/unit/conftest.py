@@ -3,7 +3,7 @@ from decimal import Decimal
 
 import pytest
 
-from models.model import Contract, Customer, Event, Role, User
+from epic_events.models.model import Contract, Customer, Event, Role, User
 
 
 @pytest.fixture

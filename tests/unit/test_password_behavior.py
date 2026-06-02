@@ -1,4 +1,4 @@
-from controllers.auth_controller import hash_password, verify_password
+from epic_events.controllers.auth_controller import hash_password, verify_password
 
 
 def test_hash_password_returns_hash_different_from_plain_password():

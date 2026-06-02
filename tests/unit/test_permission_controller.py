@@ -1,4 +1,4 @@
-from controllers.permission_controller import (
+from epic_events.controllers.permission_controller import (
     can_assign_support_to_event,
     can_create_contract,
     can_create_customer,

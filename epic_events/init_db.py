@@ -1,7 +1,7 @@
 """Create database tables from SQLAlchemy models."""
 
-from database import engine
-from models.model import Base
+from epic_events.database import engine
+from epic_events.models.model import Base
 
 
 def init_database():

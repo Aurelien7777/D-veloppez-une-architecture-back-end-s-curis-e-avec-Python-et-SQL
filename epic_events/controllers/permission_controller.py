@@ -1,6 +1,6 @@
 """Manage role-based permissions."""
 
-from models.model import Contract, Customer, Event, User
+from epic_events.models.model import Contract, Customer, Event, User
 
 
 def is_management(user: User) -> bool:

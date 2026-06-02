@@ -5,9 +5,9 @@ from getpass import getpass
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 
-from controllers.auth_controller import hash_password
-from database import SessionLocal
-from models.model import Role, User
+from epic_events.controllers.auth_controller import hash_password
+from epic_events.database import SessionLocal
+from epic_events.models.model import Role, User
 
 ROLE_NAMES = ["management", "commercial", "support"]
 

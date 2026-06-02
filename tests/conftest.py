@@ -2,8 +2,8 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from controllers.auth_controller import hash_password
-from models.model import Base, Role, User
+from epic_events.controllers.auth_controller import hash_password
+from epic_events.models.model import Base, Role, User
 
 TEST_DATABASE_URL = "sqlite:///:memory:"
 

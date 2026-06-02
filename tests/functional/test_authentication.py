@@ -1,4 +1,4 @@
-from controllers.auth_controller import authenticate_user
+from epic_events.controllers.auth_controller import authenticate_user
 
 
 def test_authenticate_user_returns_user_with_valid_credentials(
