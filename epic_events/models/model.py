@@ -42,7 +42,7 @@ class User(Base):
             f"full_name={self.full_name!r}, "
             f"role={self.role!r})"
         )
-    
+
     def is_management(self) -> bool:
         """Return True if user belongs to management role."""
 

@@ -86,7 +86,14 @@ def can_update_event(user: User, event: Event) -> bool:
 
     return False
 
+
 def can_delete_customer(user: User) -> bool:
     """Return True if user can delete customers."""
 
     return is_management(user)
+
+
+def can_delete_contract(user: User) -> bool:
+    """Return True if user can delete contracts."""
+
+    return user.is_management()

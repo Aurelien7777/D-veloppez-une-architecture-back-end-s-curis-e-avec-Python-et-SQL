@@ -5,6 +5,7 @@ from epic_events.controllers.permission_controller import (
     can_create_event,
     can_manage_users,
     can_update_contract,
+    can_delete_contract,
     can_update_customer,
     can_update_event,
     is_commercial,
@@ -166,3 +167,13 @@ def test_management_can_update_any_event(
     event = event_factory(id_support=4)
 
     assert can_update_event(management_user, event) is True
+
+def test_management_can_delete_contract(user_factory):
+    management_user = user_factory("management")
+
+    assert can_delete_contract(management_user) is True
+
+def test_commercial_cannot_delete_contract(user_factory):
+    commercial_user = user_factory("commercial")
+
+    assert can_delete_contract(commercial_user) is False

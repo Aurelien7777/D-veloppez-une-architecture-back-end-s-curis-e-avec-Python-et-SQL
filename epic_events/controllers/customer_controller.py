@@ -3,13 +3,13 @@
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from epic_events.controllers.crud_controller import get_all, get_by_id, update_fields, delete_object
 from epic_events.controllers.permission_controller import (
     can_create_customer,
     can_update_customer,
-    can_delete_customer
+    can_delete_customer,
 )
 from epic_events.models.model import Customer, User
 
@@ -17,8 +17,7 @@ from epic_events.models.model import Customer, User
 def get_all_customers(session: Session) -> list[Customer]:
     """Return all customers."""
 
-    statement = select(Customer)
-    return list(session.scalars(statement).all())
+    return get_all(session, Customer)
 
 
 def get_customer_by_id(
@@ -27,8 +26,7 @@ def get_customer_by_id(
 ) -> Optional[Customer]:
     """Return a customer by id."""
 
-    statement = select(Customer).where(Customer.id_customer == id_customer)
-    return session.scalars(statement).first()
+    return get_by_id(session, Customer, Customer.id_customer, id_customer)
 
 
 def create_customer(
@@ -74,23 +72,15 @@ def update_customer(
     if not can_update_customer(current_user, customer):
         return None
 
-    if full_name is not None:
-        customer.full_name = full_name
-
-    if email is not None:
-        customer.email = email
-
-    if phone is not None:
-        customer.phone = phone
-
-    if company_name is not None:
-        customer.company_name = company_name
-
-    customer.updated_at = datetime.now()
-
-    session.commit()
-
-    return customer
+    return update_fields(
+        session,
+        customer,
+        full_name=full_name,
+        email=email,
+        phone=phone,
+        company_name=company_name,
+        updated_at=datetime.now(),
+    )
 
 
 def delete_customer(
@@ -103,7 +93,4 @@ def delete_customer(
     if not can_delete_customer(current_user):
         return False
 
-    session.delete(customer)
-    session.commit()
-
-    return True
+    return delete_object(session, customer)
