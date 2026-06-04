@@ -11,6 +11,8 @@ from epic_events.controllers.permission_controller import (
     can_update_customer,
     can_delete_customer,
 )
+
+from epic_events.validators import validate_customer_data
 from epic_events.models.model import Customer, User
 
 
@@ -41,6 +43,9 @@ def create_customer(
 
     if not can_create_customer(current_user):
         return None
+    
+    if not validate_customer_data(full_name, email, phone, company_name):
+        return None
 
     customer = Customer(
         full_name=full_name,
@@ -70,6 +75,9 @@ def update_customer(
     """Update selected customer fields if current user is allowed."""
 
     if not can_update_customer(current_user, customer):
+        return None
+    
+    if not validate_customer_data(full_name, email, phone, company_name):
         return None
 
     return update_fields(

@@ -20,6 +20,8 @@ from epic_events.controllers.permission_controller import (
 )
 from epic_events.models.model import Contract, Event, User
 
+from epic_events.validators import validate_event_data
+
 
 def get_all_events(session: Session) -> list[Event]:
     """Return all events."""
@@ -72,6 +74,9 @@ def create_event(
     """Create an event for a signed contract."""
 
     if not can_create_event(current_user, contract):
+        return None
+    
+    if not validate_event_data(name, start_date, end_date, location, attendees):
         return None
 
     if contract.event is not None:
@@ -128,6 +133,9 @@ def update_event(
     """Update selected event fields if current user is allowed."""
 
     if not can_update_event(current_user, event):
+        return None
+    
+    if not validate_event_data(name, start_date, end_date, location, attendees):
         return None
 
     return update_fields(

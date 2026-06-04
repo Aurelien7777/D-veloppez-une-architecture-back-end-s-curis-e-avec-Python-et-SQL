@@ -13,6 +13,7 @@ from epic_events.controllers.crud_controller import (
     update_fields,
 )
 from epic_events.controllers.permission_controller import can_manage_users
+from epic_events.validators import validate_user_data
 from epic_events.models.model import Role, User
 
 
@@ -59,6 +60,15 @@ def create_user(
 
     if not can_manage_users(current_user):
         return None
+    
+    if not validate_user_data(
+        full_name,
+        email,
+        employee_number,
+        password,
+        role.name,
+    ):
+        return None
 
     user = User(
         full_name=full_name,
@@ -87,6 +97,15 @@ def update_user(
     """Update selected user fields if current user is allowed."""
 
     if not can_manage_users(current_user):
+        return None
+
+    if not validate_user_data(
+        full_name,
+        email,
+        employee_number,
+        password,
+        role.name if role else None,
+    ):
         return None
 
     password_hash = None

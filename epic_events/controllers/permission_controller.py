@@ -98,6 +98,7 @@ def can_delete_contract(user: User) -> bool:
 
     return user.is_management()
 
+
 def can_delete_event(user: User) -> bool:
     """Return True if user can delete events."""
 

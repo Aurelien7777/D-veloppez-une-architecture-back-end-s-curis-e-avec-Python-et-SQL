@@ -19,6 +19,7 @@ from epic_events.controllers.permission_controller import (
     can_update_contract,
 )
 from epic_events.models.model import Contract, Customer, User
+from epic_events.validators import validate_contract_data
 
 
 def get_all_contracts(session: Session) -> list[Contract]:
@@ -67,6 +68,9 @@ def create_contract(
 
     if not can_create_contract(current_user):
         return None
+    
+    if not validate_contract_data(total_amount, remaining_amount):
+        return None
 
     contract = Contract(
         total_amount=total_amount,
@@ -93,6 +97,9 @@ def update_contract(
     """Update selected contract fields if current user is allowed."""
 
     if not can_update_contract(current_user, contract):
+        return None
+    
+    if not validate_contract_data(total_amount, remaining_amount):
         return None
 
     return update_fields(

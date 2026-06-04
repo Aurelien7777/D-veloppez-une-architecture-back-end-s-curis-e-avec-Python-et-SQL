@@ -168,10 +168,12 @@ def test_management_can_update_any_event(
 
     assert can_update_event(management_user, event) is True
 
+
 def test_management_can_delete_contract(user_factory):
     management_user = user_factory("management")
 
     assert can_delete_contract(management_user) is True
+
 
 def test_commercial_cannot_delete_contract(user_factory):
     commercial_user = user_factory("commercial")
