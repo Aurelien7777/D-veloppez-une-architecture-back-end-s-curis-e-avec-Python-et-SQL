@@ -58,6 +58,31 @@ class User(Base):
 
         return self.role.name == "support"
 
+    def update_profile(
+        self,
+        full_name: Optional[str] = None,
+        email: Optional[str] = None,
+        employee_number: Optional[str] = None,
+        password_hash: Optional[str] = None,
+        role: Optional["Role"] = None,
+    ) -> None:
+        """Update user profile information."""
+
+        if full_name is not None:
+            self.full_name = full_name
+
+        if email is not None:
+            self.email = email
+
+        if employee_number is not None:
+            self.employee_number = employee_number
+
+        if password_hash is not None:
+            self.password_hash = password_hash
+
+        if role is not None:
+            self.role = role
+
 
 class Role(Base):
     """Represent an employee role in the CRM.
@@ -99,6 +124,29 @@ class Customer(Base):
     commercial: Mapped["User"] = relationship(back_populates="customers")
     contracts: Mapped[List["Contract"]] = relationship(back_populates="customer")
 
+    def update_contact_info(
+        self,
+        full_name: Optional[str] = None,
+        email: Optional[str] = None,
+        phone: Optional[str] = None,
+        company_name: Optional[str] = None,
+    ) -> None:
+        """Update customer contact information."""
+
+        if full_name is not None:
+            self.full_name = full_name
+
+        if email is not None:
+            self.email = email
+
+        if phone is not None:
+            self.phone = phone
+
+        if company_name is not None:
+            self.company_name = company_name
+
+        self.updated_at = datetime.now()
+
 
 class Contract(Base):
     """Represent a contract between Epic Events and a customer.
@@ -122,6 +170,39 @@ class Contract(Base):
 
     customer: Mapped["Customer"] = relationship(back_populates="contracts")
     event: Mapped[Optional["Event"]] = relationship(back_populates="contract")
+
+    def update_amounts(
+        self,
+        total_amount: Optional[Decimal] = None,
+        remaining_amount: Optional[Decimal] = None,
+    ) -> None:
+        """Update contract amounts."""
+
+        if total_amount is not None:
+            self.total_amount = total_amount
+
+        if remaining_amount is not None:
+            self.remaining_amount = remaining_amount
+
+    def update_signature_status(self, is_signed: Optional[bool] = None) -> None:
+        """Update contract signature status."""
+
+        if is_signed is not None:
+            self.is_signed = is_signed
+
+    def update_contract_info(
+        self,
+        total_amount: Optional[Decimal] = None,
+        remaining_amount: Optional[Decimal] = None,
+        is_signed: Optional[bool] = None,
+    ) -> None:
+        """Update contract information."""
+
+        self.update_amounts(
+            total_amount=total_amount,
+            remaining_amount=remaining_amount,
+        )
+        self.update_signature_status(is_signed)
 
 
 class Event(Base):
@@ -153,3 +234,40 @@ class Event(Base):
 
     contract: Mapped["Contract"] = relationship(back_populates="event")
     support: Mapped[Optional["User"]] = relationship(back_populates="events")
+
+    def assign_support(self, support_user: User) -> None:
+        """Assign a support user to the event."""
+
+        if not support_user.is_support():
+            raise ValueError("Assigned user must belong to support role.")
+
+        self.support = support_user
+
+    def update_event_info(
+        self,
+        name: Optional[str] = None,
+        start_date: Optional[datetime] = None,
+        end_date: Optional[datetime] = None,
+        location: Optional[str] = None,
+        attendees: Optional[int] = None,
+        notes: Optional[str] = None,
+    ) -> None:
+        """Update event information."""
+
+        if name is not None:
+            self.name = name
+
+        if start_date is not None:
+            self.start_date = start_date
+
+        if end_date is not None:
+            self.end_date = end_date
+
+        if location is not None:
+            self.location = location
+
+        if attendees is not None:
+            self.attendees = attendees
+
+        if notes is not None:
+            self.notes = notes
