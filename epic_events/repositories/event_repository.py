@@ -57,7 +57,6 @@ def save_event(
     """Save an event."""
 
     session.add(event)
-    session.commit()
 
     return event
 

@@ -79,7 +79,10 @@ def create_event(
         support=None,
     )
 
-    return event_repository.save_event(session, event)
+    event_repository.save_event(session, event)
+    session.commit()
+
+    return event
 
 
 def assign_support_to_event(
