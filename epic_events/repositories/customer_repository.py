@@ -36,10 +36,9 @@ def save_customer(
     session: Session,
     customer: Customer,
 ) -> Customer:
-    """Save a customer."""
+    """Add a customer to the current session."""
 
     session.add(customer)
-    session.commit()
 
     return customer
 

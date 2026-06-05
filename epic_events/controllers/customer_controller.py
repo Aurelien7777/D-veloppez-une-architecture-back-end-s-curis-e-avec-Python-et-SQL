@@ -56,7 +56,10 @@ def create_customer(
         id_commercial=current_user.id_user,
     )
 
-    return customer_repository.save_customer(session, customer)
+    customer_repository.save_customer(session, customer)
+    session.commit()
+
+    return customer
 
 
 def update_customer(
