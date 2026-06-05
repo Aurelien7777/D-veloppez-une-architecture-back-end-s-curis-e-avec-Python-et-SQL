@@ -2,25 +2,19 @@
 
 from typing import Optional
 
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from epic_events.controllers.auth_controller import hash_password
-from epic_events.repositories.base_repository import (
-    delete_object,
-    get_all,
-    get_by_id,
-    update_fields,
-)
 from epic_events.controllers.permission_controller import can_manage_users
-from epic_events.validators import validate_user_data
 from epic_events.models.model import Role, User
+from epic_events.repositories import user_repository
+from epic_events.validators import validate_user_data
 
 
 def get_all_users(session: Session) -> list[User]:
     """Return all users."""
 
-    return get_all(session, User)
+    return user_repository.get_all_users(session)
 
 
 def get_user_by_id(
@@ -29,12 +23,7 @@ def get_user_by_id(
 ) -> Optional[User]:
     """Return a user by id."""
 
-    return get_by_id(
-        session,
-        User,
-        User.id_user,
-        id_user,
-    )
+    return user_repository.get_user_by_id(session, id_user)
 
 
 def get_role_by_name(
@@ -43,8 +32,7 @@ def get_role_by_name(
 ) -> Optional[Role]:
     """Return a role by name."""
 
-    statement = select(Role).where(Role.name == role_name)
-    return session.scalars(statement).first()
+    return user_repository.get_role_by_name(session, role_name)
 
 
 def create_user(
@@ -78,10 +66,7 @@ def create_user(
         role=role,
     )
 
-    session.add(user)
-    session.commit()
-
-    return user
+    return user_repository.save_user(session, user)
 
 
 def update_user(
@@ -113,7 +98,7 @@ def update_user(
     if password is not None:
         password_hash = hash_password(password)
 
-    return update_fields(
+    return user_repository.update_user_fields(
         session,
         user,
         full_name=full_name,
@@ -137,4 +122,4 @@ def delete_user(
     if current_user.id_user == user.id_user:
         return False
 
-    return delete_object(session, user)
+    return user_repository.delete_user(session, user)
