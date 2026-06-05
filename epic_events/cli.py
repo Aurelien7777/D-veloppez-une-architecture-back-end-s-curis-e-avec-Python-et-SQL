@@ -10,6 +10,7 @@ from epic_events.controllers.token_controller import (
 from epic_events.menus.customer_menu import run_customer_menu
 from epic_events.menus.contract_menu import run_contract_menu
 from epic_events.menus.event_menu import run_event_menu
+from epic_events.menus.user_menu import run_user_menu
 
 from epic_events.database import SessionLocal
 from epic_events.views.auth_view import ask_login_credentials
@@ -92,7 +93,7 @@ def run_authenticated_menu() -> None:
         elif choice == "3":
             run_event_menu()
         elif choice == "4":
-            print_info("Menu collaborateurs à venir.")
+            run_user_menu()
         elif choice == "5":
             show_profile()
         elif choice == "6":
