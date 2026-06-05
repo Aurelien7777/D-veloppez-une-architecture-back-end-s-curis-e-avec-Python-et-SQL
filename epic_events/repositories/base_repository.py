@@ -27,22 +27,6 @@ def get_by_id(
     return session.scalars(statement).first()
 
 
-def update_fields(
-    session: Session,
-    obj: ModelType,
-    **fields: Any,
-) -> ModelType:
-    """Update selected fields on an object."""
-
-    for field_name, field_value in fields.items():
-        if field_value is not None:
-            setattr(obj, field_name, field_value)
-
-    session.commit()
-
-    return obj
-
-
 def delete_object(
     session: Session,
     obj: ModelType,
