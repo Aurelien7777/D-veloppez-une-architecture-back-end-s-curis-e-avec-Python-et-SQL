@@ -86,13 +86,15 @@ def update_contract(
     if not validate_contract_data(total_amount, remaining_amount):
         return None
 
-    return contract_repository.update_contract_fields(
-        session,
-        contract,
+    contract.update_contract_info(
         total_amount=total_amount,
         remaining_amount=remaining_amount,
         is_signed=is_signed,
     )
+
+    session.commit()
+
+    return contract
 
 
 def delete_contract(

@@ -10,7 +10,6 @@ from epic_events.repositories.base_repository import (
     delete_object,
     get_all,
     get_by_id,
-    update_fields,
 )
 
 
@@ -58,16 +57,6 @@ def save_contract(
     session.commit()
 
     return contract
-
-
-def update_contract_fields(
-    session: Session,
-    contract: Contract,
-    **fields,
-) -> Contract:
-    """Update selected contract fields."""
-
-    return update_fields(session, contract, **fields)
 
 
 def delete_contract(
