@@ -5,26 +5,20 @@ from typing import Optional
 
 from sqlalchemy.orm import Session
 
-from epic_events.repositories.base_repository import (
-    get_all,
-    get_by_id,
-    update_fields,
-    delete_object,
-)
 from epic_events.controllers.permission_controller import (
     can_create_customer,
-    can_update_customer,
     can_delete_customer,
+    can_update_customer,
 )
-
-from epic_events.validators import validate_customer_data
 from epic_events.models.model import Customer, User
+from epic_events.repositories import customer_repository
+from epic_events.validators import validate_customer_data
 
 
 def get_all_customers(session: Session) -> list[Customer]:
     """Return all customers."""
 
-    return get_all(session, Customer)
+    return customer_repository.get_all_customers(session)
 
 
 def get_customer_by_id(
@@ -33,7 +27,7 @@ def get_customer_by_id(
 ) -> Optional[Customer]:
     """Return a customer by id."""
 
-    return get_by_id(session, Customer, Customer.id_customer, id_customer)
+    return customer_repository.get_customer_by_id(session, id_customer)
 
 
 def create_customer(
@@ -62,10 +56,7 @@ def create_customer(
         id_commercial=current_user.id_user,
     )
 
-    session.add(customer)
-    session.commit()
-
-    return customer
+    return customer_repository.save_customer(session, customer)
 
 
 def update_customer(
@@ -85,7 +76,7 @@ def update_customer(
     if not validate_customer_data(full_name, email, phone, company_name):
         return None
 
-    return update_fields(
+    return customer_repository.update_customer_fields(
         session,
         customer,
         full_name=full_name,
@@ -106,4 +97,4 @@ def delete_customer(
     if not can_delete_customer(current_user):
         return False
 
-    return delete_object(session, customer)
+    return customer_repository.delete_customer(session, customer)
