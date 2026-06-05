@@ -3,15 +3,8 @@
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from epic_events.repositories.base_repository import (
-    delete_object,
-    get_all,
-    get_by_id,
-    update_fields,
-)
 from epic_events.controllers.permission_controller import (
     can_assign_support_to_event,
     can_create_event,
@@ -19,14 +12,14 @@ from epic_events.controllers.permission_controller import (
     can_update_event,
 )
 from epic_events.models.model import Contract, Event, User
-
+from epic_events.repositories import event_repository
 from epic_events.validators import validate_event_data
 
 
 def get_all_events(session: Session) -> list[Event]:
     """Return all events."""
 
-    return get_all(session, Event)
+    return event_repository.get_all_events(session)
 
 
 def get_event_by_id(
@@ -35,19 +28,13 @@ def get_event_by_id(
 ) -> Optional[Event]:
     """Return an event by id."""
 
-    return get_by_id(
-        session,
-        Event,
-        Event.id_event,
-        id_event,
-    )
+    return event_repository.get_event_by_id(session, id_event)
 
 
 def get_events_without_support(session: Session) -> list[Event]:
     """Return events without assigned support."""
 
-    statement = select(Event).where(Event.id_support.is_(None))
-    return list(session.scalars(statement).all())
+    return event_repository.get_events_without_support(session)
 
 
 def get_events_by_support(
@@ -56,8 +43,7 @@ def get_events_by_support(
 ) -> list[Event]:
     """Return events assigned to a support user."""
 
-    statement = select(Event).where(Event.id_support == support_user.id_user)
-    return list(session.scalars(statement).all())
+    return event_repository.get_events_by_support(session, support_user)
 
 
 def create_event(
@@ -93,10 +79,7 @@ def create_event(
         support=None,
     )
 
-    session.add(event)
-    session.commit()
-
-    return event
+    return event_repository.save_event(session, event)
 
 
 def assign_support_to_event(
@@ -138,7 +121,7 @@ def update_event(
     if not validate_event_data(name, start_date, end_date, location, attendees):
         return None
 
-    return update_fields(
+    return event_repository.update_event_fields(
         session,
         event,
         name=name,
@@ -160,4 +143,4 @@ def delete_event(
     if not can_delete_event(current_user):
         return False
 
-    return delete_object(session, event)
+    return event_repository.delete_event(session, event)
