@@ -7,7 +7,7 @@ from typing import Optional
 import jwt
 from dotenv import dotenv_values
 from jwt import ExpiredSignatureError, InvalidTokenError
-from sqlalchemy import select
+from epic_events.repositories import user_repository
 from sqlalchemy.orm import Session
 
 from epic_events.models.model import User
@@ -114,5 +114,4 @@ def get_current_user(session: Session) -> Optional[User]:
 
     user_id = int(payload["sub"])
 
-    statement = select(User).where(User.id_user == user_id)
-    return session.scalars(statement).first()
+    return user_repository.get_user_by_id(session, user_id)
