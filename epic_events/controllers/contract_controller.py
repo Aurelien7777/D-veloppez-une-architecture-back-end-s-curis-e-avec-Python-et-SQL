@@ -4,28 +4,22 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Optional
 
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from epic_events.repositories.base_repository import (
-    delete_object,
-    get_all,
-    get_by_id,
-    update_fields,
-)
 from epic_events.controllers.permission_controller import (
     can_create_contract,
     can_delete_contract,
     can_update_contract,
 )
 from epic_events.models.model import Contract, Customer, User
+from epic_events.repositories import contract_repository
 from epic_events.validators import validate_contract_data
 
 
 def get_all_contracts(session: Session) -> list[Contract]:
     """Return all contracts."""
 
-    return get_all(session, Contract)
+    return contract_repository.get_all_contracts(session)
 
 
 def get_contract_by_id(
@@ -34,26 +28,19 @@ def get_contract_by_id(
 ) -> Optional[Contract]:
     """Return a contract by id."""
 
-    return get_by_id(
-        session,
-        Contract,
-        Contract.id_contract,
-        id_contract,
-    )
+    return contract_repository.get_contract_by_id(session, id_contract)
 
 
 def get_unsigned_contracts(session: Session) -> list[Contract]:
     """Return all unsigned contracts."""
 
-    statement = select(Contract).where(Contract.is_signed.is_(False))
-    return list(session.scalars(statement).all())
+    return contract_repository.get_unsigned_contracts(session)
 
 
 def get_unpaid_contracts(session: Session) -> list[Contract]:
     """Return all contracts with remaining amount to pay."""
 
-    statement = select(Contract).where(Contract.remaining_amount > 0)
-    return list(session.scalars(statement).all())
+    return contract_repository.get_unpaid_contracts(session)
 
 
 def create_contract(
@@ -80,10 +67,7 @@ def create_contract(
         customer=customer,
     )
 
-    session.add(contract)
-    session.commit()
-
-    return contract
+    return contract_repository.save_contract(session, contract)
 
 
 def update_contract(
@@ -102,7 +86,7 @@ def update_contract(
     if not validate_contract_data(total_amount, remaining_amount):
         return None
 
-    return update_fields(
+    return contract_repository.update_contract_fields(
         session,
         contract,
         total_amount=total_amount,
@@ -121,4 +105,4 @@ def delete_contract(
     if not can_delete_contract(current_user):
         return False
 
-    return delete_object(session, contract)
+    return contract_repository.delete_contract(session, contract)
