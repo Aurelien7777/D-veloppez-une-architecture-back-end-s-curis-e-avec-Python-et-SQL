@@ -9,7 +9,6 @@ from epic_events.repositories.base_repository import (
     delete_object,
     get_all,
     get_by_id,
-    update_fields,
 )
 
 
@@ -43,16 +42,6 @@ def save_customer(
     session.commit()
 
     return customer
-
-
-def update_customer_fields(
-    session: Session,
-    customer: Customer,
-    **fields,
-) -> Customer:
-    """Update selected customer fields."""
-
-    return update_fields(session, customer, **fields)
 
 
 def delete_customer(

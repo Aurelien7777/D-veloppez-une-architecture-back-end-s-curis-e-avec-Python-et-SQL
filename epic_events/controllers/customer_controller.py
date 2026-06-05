@@ -76,15 +76,16 @@ def update_customer(
     if not validate_customer_data(full_name, email, phone, company_name):
         return None
 
-    return customer_repository.update_customer_fields(
-        session,
-        customer,
+    customer.update_contact_info(
         full_name=full_name,
         email=email,
         phone=phone,
         company_name=company_name,
-        updated_at=datetime.now(),
     )
+
+    session.commit()
+
+    return customer
 
 
 def delete_customer(
