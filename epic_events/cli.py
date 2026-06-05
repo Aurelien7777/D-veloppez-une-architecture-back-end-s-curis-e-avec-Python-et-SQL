@@ -7,21 +7,7 @@ from epic_events.controllers.token_controller import (
     get_current_user,
     save_token,
 )
-
-from epic_events.controllers.customer_controller import (
-    create_customer,
-    delete_customer,
-    get_all_customers,
-    get_customer_by_id,
-    update_customer,
-)
-from epic_events.views.customer_view import (
-    ask_customer_data,
-    ask_customer_id,
-    ask_customer_update_data,
-    display_customer_menu,
-    display_customers,
-)
+from epic_events.menus.customer_menu import run_customer_menu
 from epic_events.database import SessionLocal
 from epic_events.views.auth_view import ask_login_credentials
 from epic_events.views.console import print_error, print_info, print_success, print_title
@@ -113,90 +99,6 @@ def run_authenticated_menu() -> None:
             return
         else:
             print_error("Choix invalide.")
-
-
-def run_customer_menu() -> None:
-    """Run customer menu."""
-
-    while True:
-        session = SessionLocal()
-
-        try:
-            current_user = get_current_user(session)
-
-            if current_user is None:
-                print_error("Aucun utilisateur connecté.")
-                return
-
-            choice = display_customer_menu()
-
-            if choice == "1":
-                customers = get_all_customers(session)
-                display_customers(customers)
-
-            elif choice == "2":
-                customer_data = ask_customer_data()
-
-                customer = create_customer(
-                    session=session,
-                    current_user=current_user,
-                    **customer_data,
-                )
-
-                if customer is None:
-                    print_error("Création client refusée ou données invalides.")
-                else:
-                    print_success("Client créé avec succès.")
-
-            elif choice == "3":
-                id_customer = ask_customer_id()
-                customer = get_customer_by_id(session, id_customer)
-
-                if customer is None:
-                    print_error("Client introuvable.")
-                    continue
-
-                update_data = ask_customer_update_data()
-
-                updated_customer = update_customer(
-                    session=session,
-                    current_user=current_user,
-                    customer=customer,
-                    **update_data,
-                )
-
-                if updated_customer is None:
-                    print_error("Modification refusée ou données invalides.")
-                else:
-                    print_success("Client modifié avec succès.")
-
-            elif choice == "4":
-                id_customer = ask_customer_id()
-                customer = get_customer_by_id(session, id_customer)
-
-                if customer is None:
-                    print_error("Client introuvable.")
-                    continue
-
-                deleted = delete_customer(
-                    session=session,
-                    current_user=current_user,
-                    customer=customer,
-                )
-
-                if deleted:
-                    print_success("Client supprimé avec succès.")
-                else:
-                    print_error("Suppression refusée.")
-
-            elif choice == "0":
-                return
-
-            else:
-                print_error("Choix invalide.")
-
-        finally:
-            session.close()
 
 
 def main() -> None:
