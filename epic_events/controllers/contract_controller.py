@@ -109,4 +109,7 @@ def delete_contract(
     if not can_delete_contract(current_user):
         return False
 
-    return contract_repository.delete_contract(session, contract)
+    deleted = contract_repository.delete_contract(session, contract)
+    session.commit()
+
+    return deleted

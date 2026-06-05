@@ -34,6 +34,5 @@ def delete_object(
     """Delete an object."""
 
     session.delete(obj)
-    session.commit()
 
     return True

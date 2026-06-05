@@ -127,4 +127,7 @@ def delete_user(
     if current_user.id_user == user.id_user:
         return False
 
-    return user_repository.delete_user(session, user)
+    deleted = user_repository.delete_user(session, user)
+    session.commit()
+    
+    return deleted

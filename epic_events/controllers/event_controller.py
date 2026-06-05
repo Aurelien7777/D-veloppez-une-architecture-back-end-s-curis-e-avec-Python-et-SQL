@@ -150,4 +150,7 @@ def delete_event(
     if not can_delete_event(current_user):
         return False
 
-    return event_repository.delete_event(session, event)
+    deleted = event_repository.delete_event(session, event)
+    session.commit()
+    
+    return deleted

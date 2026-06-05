@@ -101,4 +101,7 @@ def delete_customer(
     if not can_delete_customer(current_user):
         return False
 
-    return customer_repository.delete_customer(session, customer)
+    deleted = customer_repository.delete_customer(session, customer)
+    session.commit()
+
+    return deleted
