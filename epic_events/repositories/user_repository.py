@@ -1,6 +1,6 @@
 """User repository."""
 
-from typing import Any, Optional
+from typing import Optional
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -10,7 +10,6 @@ from epic_events.repositories.base_repository import (
     delete_object,
     get_all,
     get_by_id,
-    update_fields,
 )
 
 
@@ -54,16 +53,6 @@ def save_user(
     session.commit()
 
     return user
-
-
-def update_user_fields(
-    session: Session,
-    user: User,
-    **fields: Any,
-) -> User:
-    """Update selected user fields."""
-
-    return update_fields(session, user, **fields)
 
 
 def delete_user(

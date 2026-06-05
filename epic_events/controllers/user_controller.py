@@ -98,15 +98,17 @@ def update_user(
     if password is not None:
         password_hash = hash_password(password)
 
-    return user_repository.update_user_fields(
-        session,
-        user,
+    user.update_profile(
         full_name=full_name,
         email=email,
         employee_number=employee_number,
         password_hash=password_hash,
         role=role,
     )
+
+    session.commit()
+
+    return user
 
 
 def delete_user(
