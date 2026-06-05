@@ -54,7 +54,7 @@ def save_event(
     session: Session,
     event: Event,
 ) -> Event:
-    """Save an event."""
+    """Add an event."""
 
     session.add(event)
 

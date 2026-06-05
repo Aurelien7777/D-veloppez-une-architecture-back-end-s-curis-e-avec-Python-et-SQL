@@ -47,10 +47,9 @@ def save_user(
     session: Session,
     user: User,
 ) -> User:
-    """Save a user."""
+    """Add a user to the current session."""
 
     session.add(user)
-    session.commit()
 
     return user
 

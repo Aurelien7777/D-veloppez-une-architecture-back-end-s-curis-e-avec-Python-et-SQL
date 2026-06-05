@@ -66,7 +66,10 @@ def create_user(
         role=role,
     )
 
-    return user_repository.save_user(session, user)
+    user_repository.save_user(session, user)
+    session.commit()
+
+    return user
 
 
 def update_user(
