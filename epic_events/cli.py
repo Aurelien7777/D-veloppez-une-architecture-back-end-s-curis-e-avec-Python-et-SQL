@@ -8,6 +8,8 @@ from epic_events.controllers.token_controller import (
     save_token,
 )
 from epic_events.menus.customer_menu import run_customer_menu
+from epic_events.menus.contract_menu import run_contract_menu
+
 from epic_events.database import SessionLocal
 from epic_events.views.auth_view import ask_login_credentials
 from epic_events.views.console import print_error, print_info, print_success, print_title
@@ -85,7 +87,7 @@ def run_authenticated_menu() -> None:
         if choice == "1":
             run_customer_menu()
         elif choice == "2":
-            print_info("Menu contrats à venir.")
+            run_contract_menu()
         elif choice == "3":
             print_info("Menu événements à venir.")
         elif choice == "4":
