@@ -43,6 +43,16 @@ def get_role_by_name(
     return session.scalars(statement).first()
 
 
+def get_user_by_email(
+    session: Session,
+    email: str,
+) -> Optional[User]:
+    """Return a user by email."""
+
+    statement = select(User).where(User.email == email)
+    return session.scalars(statement).first()
+
+
 def save_user(
     session: Session,
     user: User,

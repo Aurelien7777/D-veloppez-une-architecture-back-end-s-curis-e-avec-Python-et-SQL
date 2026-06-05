@@ -152,5 +152,5 @@ def delete_event(
 
     deleted = event_repository.delete_event(session, event)
     session.commit()
-    
+
     return deleted

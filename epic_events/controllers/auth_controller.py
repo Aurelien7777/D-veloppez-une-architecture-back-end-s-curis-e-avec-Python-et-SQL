@@ -2,10 +2,10 @@ from typing import Optional
 
 from argon2 import PasswordHasher
 from argon2.exceptions import VerificationError, VerifyMismatchError
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from epic_events.models.model import User
+from epic_events.repositories import user_repository
 
 password_hasher = PasswordHasher()
 
@@ -33,8 +33,7 @@ def authenticate_user(
 ) -> Optional[User]:
     """Authenticate a user with email and password."""
 
-    statement = select(User).where(User.email == email)
-    user = session.scalars(statement).first()
+    user = user_repository.get_user_by_email(session, email)
 
     if user is None:
         return None

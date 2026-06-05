@@ -129,5 +129,5 @@ def delete_user(
 
     deleted = user_repository.delete_user(session, user)
     session.commit()
-    
+
     return deleted
