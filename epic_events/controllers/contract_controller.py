@@ -66,8 +66,10 @@ def create_contract(
         is_signed=is_signed,
         customer=customer,
     )
+    contract_repository.save_contract(session, contract)
+    session.commit()
 
-    return contract_repository.save_contract(session, contract)
+    return contract
 
 
 def update_contract(

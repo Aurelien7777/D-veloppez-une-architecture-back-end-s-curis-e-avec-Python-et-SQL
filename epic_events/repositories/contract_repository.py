@@ -54,7 +54,6 @@ def save_contract(
     """Save a contract."""
 
     session.add(contract)
-    session.commit()
 
     return contract
 
