@@ -6,7 +6,7 @@ from typing import Optional
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from epic_events.controllers.crud_controller import (
+from epic_events.repositories.base_repository import (
     delete_object,
     get_all,
     get_by_id,
@@ -75,7 +75,7 @@ def create_event(
 
     if not can_create_event(current_user, contract):
         return None
-    
+
     if not validate_event_data(name, start_date, end_date, location, attendees):
         return None
 
@@ -134,7 +134,7 @@ def update_event(
 
     if not can_update_event(current_user, event):
         return None
-    
+
     if not validate_event_data(name, start_date, end_date, location, attendees):
         return None
 

@@ -64,41 +64,53 @@ def test_is_valid_date_range():
 
 
 def test_validate_customer_data():
-    assert validate_customer_data(
-        full_name="Kevin Casey",
-        email="kevin@startup.io",
-        phone="+33612345678",
-        company_name="Cool Startup LLC",
-    ) is True
+    assert (
+        validate_customer_data(
+            full_name="Kevin Casey",
+            email="kevin@startup.io",
+            phone="+33612345678",
+            company_name="Cool Startup LLC",
+        )
+        is True
+    )
 
     assert validate_customer_data(email="bad-email") is False
     assert validate_customer_data(full_name="   ") is False
 
 
 def test_validate_contract_data():
-    assert validate_contract_data(
-        total_amount=Decimal("1000.00"),
-        remaining_amount=Decimal("500.00"),
-    ) is True
+    assert (
+        validate_contract_data(
+            total_amount=Decimal("1000.00"),
+            remaining_amount=Decimal("500.00"),
+        )
+        is True
+    )
 
     assert validate_contract_data(total_amount=Decimal("-1.00")) is False
-    assert validate_contract_data(
-        total_amount=Decimal("500.00"),
-        remaining_amount=Decimal("1000.00"),
-    ) is False
+    assert (
+        validate_contract_data(
+            total_amount=Decimal("500.00"),
+            remaining_amount=Decimal("1000.00"),
+        )
+        is False
+    )
 
 
 def test_validate_event_data():
     start_date = datetime.now()
     end_date = start_date + timedelta(hours=2)
 
-    assert validate_event_data(
-        name="Wedding",
-        start_date=start_date,
-        end_date=end_date,
-        location="Paris",
-        attendees=100,
-    ) is True
+    assert (
+        validate_event_data(
+            name="Wedding",
+            start_date=start_date,
+            end_date=end_date,
+            location="Paris",
+            attendees=100,
+        )
+        is True
+    )
 
     assert validate_event_data(name="") is False
     assert validate_event_data(attendees=0) is False
@@ -106,13 +118,16 @@ def test_validate_event_data():
 
 
 def test_validate_user_data():
-    assert validate_user_data(
-        full_name="Bill Bouquet",
-        email="bill@epicevents.com",
-        employee_number="EMP001",
-        password="Secure123!",
-        role_name="management",
-    ) is True
+    assert (
+        validate_user_data(
+            full_name="Bill Bouquet",
+            email="bill@epicevents.com",
+            employee_number="EMP001",
+            password="Secure123!",
+            role_name="management",
+        )
+        is True
+    )
 
     assert validate_user_data(email="bad-email") is False
     assert validate_user_data(password="short") is False

@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from epic_events.controllers.auth_controller import hash_password
-from epic_events.controllers.crud_controller import (
+from epic_events.repositories.base_repository import (
     delete_object,
     get_all,
     get_by_id,
@@ -60,7 +60,7 @@ def create_user(
 
     if not can_manage_users(current_user):
         return None
-    
+
     if not validate_user_data(
         full_name,
         email,

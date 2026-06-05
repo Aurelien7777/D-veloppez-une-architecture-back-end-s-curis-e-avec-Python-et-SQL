@@ -7,7 +7,7 @@ from typing import Optional
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from epic_events.controllers.crud_controller import (
+from epic_events.repositories.base_repository import (
     delete_object,
     get_all,
     get_by_id,
@@ -68,7 +68,7 @@ def create_contract(
 
     if not can_create_contract(current_user):
         return None
-    
+
     if not validate_contract_data(total_amount, remaining_amount):
         return None
 
@@ -98,7 +98,7 @@ def update_contract(
 
     if not can_update_contract(current_user, contract):
         return None
-    
+
     if not validate_contract_data(total_amount, remaining_amount):
         return None
 

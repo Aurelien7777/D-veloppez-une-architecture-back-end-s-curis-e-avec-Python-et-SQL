@@ -5,7 +5,12 @@ from typing import Optional
 
 from sqlalchemy.orm import Session
 
-from epic_events.controllers.crud_controller import get_all, get_by_id, update_fields, delete_object
+from epic_events.repositories.base_repository import (
+    get_all,
+    get_by_id,
+    update_fields,
+    delete_object,
+)
 from epic_events.controllers.permission_controller import (
     can_create_customer,
     can_update_customer,
@@ -43,7 +48,7 @@ def create_customer(
 
     if not can_create_customer(current_user):
         return None
-    
+
     if not validate_customer_data(full_name, email, phone, company_name):
         return None
 
@@ -76,7 +81,7 @@ def update_customer(
 
     if not can_update_customer(current_user, customer):
         return None
-    
+
     if not validate_customer_data(full_name, email, phone, company_name):
         return None
 
