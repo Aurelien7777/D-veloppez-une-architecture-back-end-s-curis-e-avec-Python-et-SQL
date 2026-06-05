@@ -10,7 +10,6 @@ from epic_events.repositories.base_repository import (
     delete_object,
     get_all,
     get_by_id,
-    update_fields,
 )
 
 
@@ -61,16 +60,6 @@ def save_event(
     session.commit()
 
     return event
-
-
-def update_event_fields(
-    session: Session,
-    event: Event,
-    **fields,
-) -> Event:
-    """Update selected event fields."""
-
-    return update_fields(session, event, **fields)
 
 
 def delete_event(

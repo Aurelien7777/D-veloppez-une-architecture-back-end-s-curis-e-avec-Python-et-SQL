@@ -93,10 +93,12 @@ def assign_support_to_event(
     if not can_assign_support_to_event(current_user):
         return None
 
-    if not support_user.is_support():
+    try:
+        event.assign_support(support_user)
+
+    except ValueError:
         return None
 
-    event.support = support_user
     session.commit()
 
     return event
@@ -121,9 +123,7 @@ def update_event(
     if not validate_event_data(name, start_date, end_date, location, attendees):
         return None
 
-    return event_repository.update_event_fields(
-        session,
-        event,
+    event.update_event_info(
         name=name,
         start_date=start_date,
         end_date=end_date,
@@ -131,6 +131,10 @@ def update_event(
         attendees=attendees,
         notes=notes,
     )
+
+    session.commit()
+
+    return event
 
 
 def delete_event(
