@@ -1,6 +1,7 @@
 """Reusable input helpers for terminal views."""
 
 from decimal import Decimal, InvalidOperation
+from datetime import datetime
 from typing import Optional
 
 from epic_events.views.console import print_error
@@ -95,3 +96,35 @@ def ask_optional_boolean(label: str) -> Optional[bool]:
             return False
 
         print_error("Réponse invalide. Veuillez répondre par oui ou non.")
+
+
+def ask_datetime(label: str, date_format: str = "%Y-%m-%d %H:%M") -> datetime:
+    """Ask a datetime value until input is valid."""
+
+    while True:
+        value = input(f"{label} ({date_format}) : ").strip()
+
+        try:
+            return datetime.strptime(value, date_format)
+
+        except ValueError:
+            print_error("Date invalide. Format attendu : YYYY-MM-DD HH:MM")
+
+
+def ask_optional_datetime(
+    label: str,
+    date_format: str = "%Y-%m-%d %H:%M",
+) -> Optional[datetime]:
+    """Ask an optional datetime value."""
+
+    while True:
+        value = input(f"{label} ({date_format}) : ").strip()
+
+        if not value:
+            return None
+
+        try:
+            return datetime.strptime(value, date_format)
+
+        except ValueError:
+            print_error("Date invalide. Format attendu : YYYY-MM-DD HH:MM")

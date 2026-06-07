@@ -1,10 +1,14 @@
 """Event terminal views."""
 
-from datetime import datetime
-from typing import Optional
-
 from epic_events.models.model import Event
 from epic_events.views.console import print_info, print_title
+
+from epic_events.views.input_helpers import (
+    ask_datetime,
+    ask_int,
+    ask_optional_datetime,
+    ask_optional_int,
+)
 
 DATE_FORMAT = "%Y-%m-%d %H:%M"
 
@@ -48,59 +52,19 @@ def display_events(events: list[Event]) -> None:
 def ask_event_id() -> int:
     """Ask event id."""
 
-    return int(input("ID de l'événement : "))
+    return ask_int("ID de l'événement : ")
 
 
 def ask_event_contract_id() -> int:
     """Ask contract id for event creation."""
 
-    return int(input("ID du contrat : "))
+    return ask_int("ID du contrat : ")
 
 
 def ask_support_user_id() -> int:
     """Ask support user id."""
 
-    return int(input("ID du collaborateur support : "))
-
-
-def ask_datetime(label: str) -> datetime:
-    """Ask a required datetime."""
-
-    while True:
-        value = input(f"{label} ({DATE_FORMAT}) : ")
-
-        try:
-            return datetime.strptime(value, DATE_FORMAT)
-
-        except ValueError:
-            print_info("Date invalide. Format attendu : YYYY-MM-DD HH:MM")
-
-
-def ask_optional_datetime(label: str) -> Optional[datetime]:
-    """Ask an optional datetime."""
-
-    while True:
-        value = input(f"{label} ({DATE_FORMAT}) : ")
-
-        if not value:
-            return None
-
-        try:
-            return datetime.strptime(value, DATE_FORMAT)
-
-        except ValueError:
-            print_info("Date invalide. Format attendu : YYYY-MM-DD HH:MM")
-
-
-def ask_optional_integer(label: str) -> Optional[int]:
-    """Ask an optional integer."""
-
-    value = input(label)
-
-    if not value:
-        return None
-
-    return int(value)
+    return ask_int("ID du collaborateur support : ")
 
 
 def ask_event_data() -> dict:
@@ -111,7 +75,7 @@ def ask_event_data() -> dict:
         "start_date": ask_datetime("Date de début"),
         "end_date": ask_datetime("Date de fin"),
         "location": input("Lieu : "),
-        "attendees": int(input("Nombre de participants : ")),
+        "attendees": ask_int("Nombre de participants : "),
         "notes": input("Notes : ") or None,
     }
 
@@ -126,6 +90,6 @@ def ask_event_update_data() -> dict:
         "start_date": ask_optional_datetime("Nouvelle date de début"),
         "end_date": ask_optional_datetime("Nouvelle date de fin"),
         "location": input("Nouveau lieu : ") or None,
-        "attendees": ask_optional_integer("Nouveau nombre de participants : "),
+        "attendees": ask_optional_int("Nouveau nombre de participants : "),
         "notes": input("Nouvelles notes : ") or None,
     }
