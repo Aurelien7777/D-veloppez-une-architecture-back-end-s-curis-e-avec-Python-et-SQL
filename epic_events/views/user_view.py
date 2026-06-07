@@ -4,6 +4,7 @@ from typing import Optional
 
 from epic_events.models.model import User
 from epic_events.views.console import print_info, print_title
+from epic_events.views.input_helpers import ask_int
 
 VALID_ROLES = ["management", "commercial", "support"]
 
@@ -40,7 +41,7 @@ def display_users(users: list[User]) -> None:
 def ask_user_id() -> int:
     """Ask user id."""
 
-    return int(input("ID du collaborateur : "))
+    return ask_int("ID du collaborateur : ")
 
 
 def ask_role_name() -> str:
