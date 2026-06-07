@@ -1,3 +1,4 @@
+import pytest
 from epic_events.controllers.customer_controller import (
     create_customer,
     delete_customer,
@@ -5,6 +6,8 @@ from epic_events.controllers.customer_controller import (
     get_customer_by_id,
     update_customer,
 )
+
+from epic_events.exceptions import PermissionDeniedError
 
 
 def test_get_all_customers_returns_customers(
@@ -66,16 +69,15 @@ def test_create_customer_with_support_user_returns_none(
     test_session,
     support_user,
 ):
-    customer = create_customer(
-        session=test_session,
-        current_user=support_user,
-        full_name="Kevin Casey",
-        email="kevin@startup.io",
-        phone="+67812345678",
-        company_name="Cool Startup LLC",
-    )
-
-    assert customer is None
+    with pytest.raises(PermissionDeniedError):
+        create_customer(
+            session=test_session,
+            current_user=support_user,
+            full_name="Kevin Casey",
+            email="kevin@startup.io",
+            phone="+67812345678",
+            company_name="Cool Startup LLC",
+        )
 
 
 def test_update_customer_can_update_one_field(

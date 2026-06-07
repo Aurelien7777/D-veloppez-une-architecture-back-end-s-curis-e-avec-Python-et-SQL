@@ -21,6 +21,8 @@ from epic_events.views.customer_view import (
     display_customers,
 )
 
+from epic_events.exceptions import InvalidDataError, PermissionDeniedError
+
 
 def show_all_customers(session: Session) -> None:
     """Display all customers."""
@@ -36,15 +38,18 @@ def create_customer_from_menu(
     """Ask customer data and create a customer."""
 
     customer_data = ask_customer_data()
+    try:
+        create_customer(
+            session=session,
+            current_user=current_user,
+            **customer_data,
+        )
 
-    customer = create_customer(
-        session=session,
-        current_user=current_user,
-        **customer_data,
-    )
+    except PermissionDeniedError as error:
+        print_error(str(error))
 
-    if customer is None:
-        print_error("Création client refusée ou données invalides.")
+    except InvalidDataError as error:
+        print_error(str(error))
         return
 
     print_success("Client créé avec succès.")

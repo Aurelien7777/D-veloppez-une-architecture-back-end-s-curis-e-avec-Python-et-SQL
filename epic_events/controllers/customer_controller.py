@@ -13,6 +13,7 @@ from epic_events.controllers.permission_controller import (
 from epic_events.models.model import Customer, User
 from epic_events.repositories import customer_repository
 from epic_events.validators import validate_customer_data
+from epic_events.exceptions import InvalidDataError, PermissionDeniedError
 
 
 def get_all_customers(session: Session) -> list[Customer]:
@@ -37,14 +38,14 @@ def create_customer(
     email: str,
     phone: str,
     company_name: str,
-) -> Optional[Customer]:
+) -> Customer:
     """Create a customer assigned to the current commercial user."""
 
     if not can_create_customer(current_user):
-        return None
+        raise PermissionDeniedError("Seul un commercial peut créer un client.")
 
     if not validate_customer_data(full_name, email, phone, company_name):
-        return None
+        raise InvalidDataError("Les données du client sont invalides.")
 
     customer = Customer(
         full_name=full_name,
