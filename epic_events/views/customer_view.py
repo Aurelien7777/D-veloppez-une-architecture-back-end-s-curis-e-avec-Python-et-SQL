@@ -4,6 +4,7 @@ from rich.table import Table
 
 from epic_events.models.model import Customer
 from epic_events.views.console import console, print_info, print_title
+from epic_events.views.input_helpers import ask_int
 
 
 def display_customer_menu() -> str:
@@ -75,4 +76,4 @@ def ask_customer_update_data() -> dict[str, str | None]:
 def ask_customer_id() -> int:
     """Ask customer id."""
 
-    return int(input("ID client : "))
+    return ask_int("ID client : ")
