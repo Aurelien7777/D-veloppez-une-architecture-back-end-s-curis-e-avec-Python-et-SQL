@@ -1,10 +1,15 @@
 """Contract terminal views."""
 
-from decimal import Decimal, InvalidOperation
-from typing import Optional
-
 from epic_events.models.model import Contract
 from epic_events.views.console import print_info, print_title
+
+from epic_events.views.input_helpers import (
+    ask_boolean,
+    ask_decimal,
+    ask_int,
+    ask_optional_boolean,
+    ask_optional_decimal,
+)
 
 
 def display_contract_menu() -> str:
@@ -42,61 +47,13 @@ def display_contracts(contracts: list[Contract]) -> None:
 def ask_contract_id() -> int:
     """Ask contract id."""
 
-    return int(input("ID du contrat : "))
+    return ask_int("ID du contrat : ")
 
 
 def ask_contract_customer_id() -> int:
     """Ask customer id for contract creation."""
 
-    return int(input("ID du client : "))
-
-
-def ask_decimal(label: str) -> Decimal:
-    """Ask a required decimal value."""
-
-    while True:
-        value = input(label)
-
-        try:
-            return Decimal(value)
-
-        except InvalidOperation:
-            print_info("Montant invalide.")
-
-
-def ask_optional_decimal(label: str) -> Optional[Decimal]:
-    """Ask an optional decimal value."""
-
-    value = input(label)
-
-    if not value:
-        return None
-
-    try:
-        return Decimal(value)
-
-    except InvalidOperation:
-        print_info("Montant invalide.")
-        return None
-
-
-def ask_boolean(label: str) -> bool:
-    """Ask a boolean value."""
-
-    value = input(label).lower()
-
-    return value in ["o", "oui", "y", "yes", "1"]
-
-
-def ask_optional_boolean(label: str) -> Optional[bool]:
-    """Ask an optional boolean value."""
-
-    value = input(label).lower()
-
-    if not value:
-        return None
-
-    return value in ["o", "oui", "y", "yes", "1"]
+    return ask_int("ID du client : ")
 
 
 def ask_contract_data() -> dict:
