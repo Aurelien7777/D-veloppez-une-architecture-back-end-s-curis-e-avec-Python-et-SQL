@@ -4,6 +4,12 @@ from typing import Optional
 
 from sqlalchemy.orm import Session
 
+from epic_events.exceptions import (
+    BusinessRuleError,
+    InvalidDataError,
+    PermissionDeniedError,
+)
+
 from epic_events.controllers.auth_controller import hash_password
 from epic_events.controllers.permission_controller import can_manage_users
 from epic_events.models.model import Role, User
@@ -47,7 +53,7 @@ def create_user(
     """Create a user if current user is allowed."""
 
     if not can_manage_users(current_user):
-        return None
+        raise PermissionDeniedError("Vous n'êtes pas autorisé à créer un collaborateur.")
 
     if not validate_user_data(
         full_name,
@@ -56,7 +62,7 @@ def create_user(
         password,
         role.name,
     ):
-        return None
+        raise InvalidDataError("Les données du collaborateur sont invalides.")
 
     user = User(
         full_name=full_name,
@@ -85,7 +91,7 @@ def update_user(
     """Update selected user fields if current user is allowed."""
 
     if not can_manage_users(current_user):
-        return None
+        raise PermissionDeniedError("Vous n'êtes pas autorisé à modifier un collaborateur.")
 
     if not validate_user_data(
         full_name,
@@ -94,7 +100,7 @@ def update_user(
         password,
         role.name if role else None,
     ):
-        return None
+        raise InvalidDataError("Les données du collaborateur sont invalides.")
 
     password_hash = None
 
@@ -122,10 +128,10 @@ def delete_user(
     """Delete a user if current user is allowed."""
 
     if not can_manage_users(current_user):
-        return False
+        raise PermissionDeniedError("Vous n'êtes pas autorisé à supprimer un collaborateur.")
 
     if current_user.id_user == user.id_user:
-        return False
+        raise BusinessRuleError("Vous ne pouvez pas supprimer votre propre compte.")
 
     deleted = user_repository.delete_user(session, user)
     session.commit()

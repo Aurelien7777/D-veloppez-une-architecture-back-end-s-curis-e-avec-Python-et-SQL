@@ -80,7 +80,6 @@ def create_event_from_menu(
     except EpicEventsError as error:
         print_error(str(error))
 
-
     print_success("Événement créé avec succès.")
 
 

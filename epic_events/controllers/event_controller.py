@@ -14,11 +14,8 @@ from epic_events.controllers.permission_controller import (
 from epic_events.models.model import Contract, Event, User
 from epic_events.repositories import event_repository
 from epic_events.validators import validate_event_data
-from epic_events.exceptions import (
-    BusinessRuleError, 
-    InvalidDataError, 
-    PermissionDeniedError
-)
+from epic_events.exceptions import BusinessRuleError, InvalidDataError, PermissionDeniedError
+
 
 def get_all_events(session: Session) -> list[Event]:
     """Return all events."""
@@ -62,10 +59,10 @@ def create_event(
     notes: Optional[str] = None,
 ) -> Event:
     """Create an event for a signed contract."""
-    
+
     if contract.event is not None:
         raise BusinessRuleError("Un événement existe déjà pour ce contrat.")
-    
+
     if not validate_event_data(name, start_date, end_date, location, attendees):
         raise InvalidDataError("Les données de l'événement sont invalides.")
 

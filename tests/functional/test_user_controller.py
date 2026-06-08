@@ -2,6 +2,12 @@ from typing import Any
 
 import pytest
 
+from epic_events.exceptions import (
+    BusinessRuleError,
+    InvalidDataError,
+    PermissionDeniedError,
+)
+
 from epic_events.controllers.auth_controller import verify_password
 from epic_events.controllers.user_controller import (
     create_user as create_crm_user,
@@ -48,17 +54,16 @@ def test_non_management_user_cannot_create_user(
 ):
     current_user = request.getfixturevalue(current_user_fixture)
 
-    user = create_crm_user(
-        session=test_session,
-        current_user=current_user,
-        full_name="Blocked User",
-        email="blocked@epicevents.com",
-        employee_number="BLOCK001",
-        password="SecurePassword123!",
-        role=commercial_role,
-    )
-
-    assert user is None
+    with pytest.raises(PermissionDeniedError):
+        create_crm_user(
+            session=test_session,
+            current_user=current_user,
+            full_name="Blocked User",
+            email="blocked@epicevents.com",
+            employee_number="BLOCK001",
+            password="SecurePassword123!",
+            role=commercial_role,
+        )
 
 
 def test_get_all_users_returns_users(test_session, management_user):
@@ -102,14 +107,14 @@ def test_non_management_user_cannot_update_user(
     commercial_user,
     support_user,
 ):
-    updated_user = update_user(
-        session=test_session,
-        current_user=commercial_user,
-        user=support_user,
-        full_name="Blocked Update",
-    )
+    with pytest.raises(PermissionDeniedError):
+        update_user(
+            session=test_session,
+            current_user=commercial_user,
+            user=support_user,
+            full_name="Blocked Update",
+        )
 
-    assert updated_user is None
     assert support_user.full_name == "Support User"
 
 
@@ -136,15 +141,15 @@ def test_management_cannot_delete_himself(
     test_session,
     management_user,
 ):
-    result = delete_user(
-        session=test_session,
-        current_user=management_user,
-        user=management_user,
-    )
+    with pytest.raises(BusinessRuleError):
+        delete_user(
+            session=test_session,
+            current_user=management_user,
+            user=management_user,
+        )
 
     existing_user = get_user_by_id(test_session, management_user.id_user)
 
-    assert result is False
     assert existing_user is not None
 
 
@@ -153,13 +158,46 @@ def test_non_management_user_cannot_delete_user(
     commercial_user,
     support_user,
 ):
-    result = delete_user(
-        session=test_session,
-        current_user=commercial_user,
-        user=support_user,
-    )
+    with pytest.raises(PermissionDeniedError):
+        delete_user(
+            session=test_session,
+            current_user=commercial_user,
+            user=support_user,
+        )
 
     existing_user = get_user_by_id(test_session, support_user.id_user)
 
-    assert result is False
     assert existing_user is not None
+
+
+def test_management_cannot_create_user_with_invalid_data(
+    test_session,
+    management_user,
+    commercial_role,
+):
+    with pytest.raises(InvalidDataError):
+        create_crm_user(
+            session=test_session,
+            current_user=management_user,
+            full_name="",
+            email="invalid-email",
+            employee_number="COM999",
+            password="short",
+            role=commercial_role,
+        )
+
+
+def test_management_cannot_update_user_with_invalid_data(
+    test_session,
+    management_user,
+    commercial_user,
+):
+    with pytest.raises(InvalidDataError):
+        update_user(
+            session=test_session,
+            current_user=management_user,
+            user=commercial_user,
+            email="invalid-email",
+        )
+
+    assert commercial_user.email != "invalid-email"

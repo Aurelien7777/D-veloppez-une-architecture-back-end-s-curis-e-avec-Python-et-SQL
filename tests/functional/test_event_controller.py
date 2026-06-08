@@ -122,7 +122,7 @@ def test_commercial_cannot_create_event_for_unsigned_contract(
     management_user,
     commercial_user,
 ):
-    
+
     customer = create_test_customer(test_session, commercial_user)
     contract = create_test_contract(
         test_session,
@@ -130,7 +130,7 @@ def test_commercial_cannot_create_event_for_unsigned_contract(
         customer,
         is_signed=False,
     )
-    
+
     with pytest.raises(PermissionDeniedError):
         create_test_event(test_session, commercial_user, contract)
 
@@ -157,11 +157,12 @@ def test_cannot_create_two_events_for_same_contract(
     contract = create_test_contract(test_session, management_user, customer)
 
     first_event = create_test_event(test_session, commercial_user, contract)
-    
+
     with pytest.raises(BusinessRuleError):
         create_test_event(test_session, commercial_user, contract)
 
     assert first_event is not None
+
 
 def test_management_can_assign_support_to_event(
     test_session,

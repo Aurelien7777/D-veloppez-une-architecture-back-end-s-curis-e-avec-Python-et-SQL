@@ -4,7 +4,7 @@ from typing import Optional
 
 from sqlalchemy.orm import Session
 
-from epic_events.exceptions import InvalidDataError, PermissionDeniedError
+from epic_events.exceptions import EpicEventsError
 from epic_events.controllers.permission_controller import can_manage_users
 from epic_events.controllers.token_controller import get_current_user
 from epic_events.controllers.user_controller import (
@@ -68,18 +68,18 @@ def create_user_from_menu(
     if role is None:
         return
 
-    user = create_user(
-        session=session,
-        current_user=current_user,
-        full_name=user_data["full_name"],
-        email=user_data["email"],
-        employee_number=user_data["employee_number"],
-        password=user_data["password"],
-        role=role,
-    )
-
-    if user is None:
-        print_error("Création collaborateur impossible : permission refusée ou données invalides.")
+    try:
+        create_user(
+            session=session,
+            current_user=current_user,
+            full_name=user_data["full_name"],
+            email=user_data["email"],
+            employee_number=user_data["employee_number"],
+            password=user_data["password"],
+            role=role,
+        )
+    except EpicEventsError as error:
+        print_error(str(error))
         return
 
     print_success("Collaborateur créé avec succès.")
@@ -93,6 +93,7 @@ def update_user_from_menu(
 
     if not can_manage_users(current_user):
         print_error("Seul un membre de la gestion peut modifier un utilisateur.")
+
     id_user = ask_user_id()
     user = get_user_by_id(session, id_user)
 
@@ -106,21 +107,19 @@ def update_user_from_menu(
     if update_data["role_name"] is not None and role is None:
         return
 
-    updated_user = update_user(
-        session=session,
-        current_user=current_user,
-        user=user,
-        full_name=update_data["full_name"],
-        email=update_data["email"],
-        employee_number=update_data["employee_number"],
-        password=update_data["password"],
-        role=role,
-    )
-
-    if updated_user is None:
-        print_error(
-            "Modification collaborateur impossible : permission refusée ou données invalides."
+    try:
+        update_user(
+            session=session,
+            current_user=current_user,
+            user=user,
+            full_name=update_data["full_name"],
+            email=update_data["email"],
+            employee_number=update_data["employee_number"],
+            password=update_data["password"],
+            role=role,
         )
+    except EpicEventsError as error:
+        print_error(str(error))
         return
 
     print_success("Collaborateur modifié avec succès.")
@@ -139,17 +138,17 @@ def delete_user_from_menu(
         print_error("Collaborateur introuvable.")
         return
 
-    deleted = delete_user(
-        session=session,
-        current_user=current_user,
-        user=user,
-    )
-
-    if deleted:
-        print_success("Collaborateur supprimé avec succès.")
+    try:
+        delete_user(
+            session=session,
+            current_user=current_user,
+            user=user,
+        )
+    except EpicEventsError as error:
+        print_error(str(error))
         return
 
-    print_error("Suppression collaborateur refusée.")
+    print_success("Collaborateur supprimé avec succès.")
 
 
 def run_user_menu() -> None:

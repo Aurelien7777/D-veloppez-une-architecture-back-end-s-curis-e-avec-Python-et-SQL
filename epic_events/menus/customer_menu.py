@@ -3,7 +3,7 @@
 from sqlalchemy.orm import Session
 from epic_events.controllers.permission_controller import can_create_customer
 
-from epic_events.controllers.customer_controller import(
+from epic_events.controllers.customer_controller import (
     create_customer,
     delete_customer,
     get_all_customers,
