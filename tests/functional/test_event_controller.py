@@ -1,5 +1,12 @@
+import pytest
 from datetime import datetime, timedelta
 from decimal import Decimal
+
+from epic_events.exceptions import (
+    BusinessRuleError,
+    InvalidDataError,
+    PermissionDeniedError,
+)
 
 from epic_events.controllers.contract_controller import create_contract
 from epic_events.controllers.customer_controller import create_customer
@@ -115,6 +122,7 @@ def test_commercial_cannot_create_event_for_unsigned_contract(
     management_user,
     commercial_user,
 ):
+    
     customer = create_test_customer(test_session, commercial_user)
     contract = create_test_contract(
         test_session,
@@ -122,10 +130,9 @@ def test_commercial_cannot_create_event_for_unsigned_contract(
         customer,
         is_signed=False,
     )
-
-    event = create_test_event(test_session, commercial_user, contract)
-
-    assert event is None
+    
+    with pytest.raises(PermissionDeniedError):
+        create_test_event(test_session, commercial_user, contract)
 
 
 def test_other_commercial_cannot_create_event_for_contract(
@@ -137,9 +144,8 @@ def test_other_commercial_cannot_create_event_for_contract(
     customer = create_test_customer(test_session, commercial_user)
     contract = create_test_contract(test_session, management_user, customer)
 
-    event = create_test_event(test_session, other_commercial_user, contract)
-
-    assert event is None
+    with pytest.raises(PermissionDeniedError):
+        create_test_event(test_session, other_commercial_user, contract)
 
 
 def test_cannot_create_two_events_for_same_contract(
@@ -151,11 +157,11 @@ def test_cannot_create_two_events_for_same_contract(
     contract = create_test_contract(test_session, management_user, customer)
 
     first_event = create_test_event(test_session, commercial_user, contract)
-    second_event = create_test_event(test_session, commercial_user, contract)
+    
+    with pytest.raises(BusinessRuleError):
+        create_test_event(test_session, commercial_user, contract)
 
     assert first_event is not None
-    assert second_event is None
-
 
 def test_management_can_assign_support_to_event(
     test_session,
@@ -188,14 +194,14 @@ def test_commercial_cannot_assign_support_to_event(
     contract = create_test_contract(test_session, management_user, customer)
     event = create_test_event(test_session, commercial_user, contract)
 
-    updated_event = assign_support_to_event(
-        session=test_session,
-        current_user=commercial_user,
-        event=event,
-        support_user=support_user,
-    )
+    with pytest.raises(PermissionDeniedError):
+        assign_support_to_event(
+            session=test_session,
+            current_user=commercial_user,
+            event=event,
+            support_user=support_user,
+        )
 
-    assert updated_event is None
     assert event.id_support is None
 
 
@@ -208,14 +214,14 @@ def test_management_cannot_assign_non_support_user(
     contract = create_test_contract(test_session, management_user, customer)
     event = create_test_event(test_session, commercial_user, contract)
 
-    updated_event = assign_support_to_event(
-        session=test_session,
-        current_user=management_user,
-        event=event,
-        support_user=commercial_user,
-    )
+    with pytest.raises(InvalidDataError):
+        assign_support_to_event(
+            session=test_session,
+            current_user=management_user,
+            event=event,
+            support_user=commercial_user,
+        )
 
-    assert updated_event is None
     assert event.id_support is None
 
 
@@ -316,14 +322,14 @@ def test_support_cannot_update_unassigned_event(
     contract = create_test_contract(test_session, management_user, customer)
     event = create_test_event(test_session, commercial_user, contract)
 
-    updated_event = update_event(
-        session=test_session,
-        current_user=support_user,
-        event=event,
-        location="Lyon",
-    )
+    with pytest.raises(PermissionDeniedError):
+        update_event(
+            session=test_session,
+            current_user=support_user,
+            event=event,
+            location="Lyon",
+        )
 
-    assert updated_event is None
     assert event.location == "Paris"
 
 
@@ -377,13 +383,13 @@ def test_commercial_cannot_delete_event(
     contract = create_test_contract(test_session, management_user, customer)
     event = create_test_event(test_session, commercial_user, contract)
 
-    result = delete_event(
-        session=test_session,
-        current_user=commercial_user,
-        event=event,
-    )
+    with pytest.raises(PermissionDeniedError):
+        delete_event(
+            session=test_session,
+            current_user=commercial_user,
+            event=event,
+        )
 
     existing_event = get_event_by_id(test_session, event.id_event)
 
-    assert result is False
     assert existing_event is not None

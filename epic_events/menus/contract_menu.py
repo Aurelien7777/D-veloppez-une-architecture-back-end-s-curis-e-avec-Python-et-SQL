@@ -2,6 +2,7 @@
 
 from sqlalchemy.orm import Session
 
+from epic_events.controllers.permission_controller import can_create_contract
 from epic_events.controllers.contract_controller import (
     create_contract,
     delete_contract,
@@ -24,6 +25,8 @@ from epic_events.views.contract_view import (
     display_contract_menu,
     display_contracts,
 )
+
+from epic_events.exceptions import EpicEventsError
 
 
 def show_all_contracts(session: Session) -> None:
@@ -53,6 +56,10 @@ def create_contract_from_menu(
 ) -> None:
     """Ask contract data and create a contract."""
 
+    if not can_create_contract(current_user):
+        print_error("Seul un membre de la gestion peut créer un contrat.")
+        return
+
     id_customer = ask_contract_customer_id()
     customer = get_customer_by_id(session, id_customer)
 
@@ -62,15 +69,16 @@ def create_contract_from_menu(
 
     contract_data = ask_contract_data()
 
-    contract = create_contract(
-        session=session,
-        current_user=current_user,
-        customer=customer,
-        **contract_data,
-    )
+    try:
+        create_contract(
+            session=session,
+            current_user=current_user,
+            customer=customer,
+            **contract_data,
+        )
 
-    if contract is None:
-        print_error("Création contrat impossible : permission refusée ou données invalides.")
+    except EpicEventsError as error:
+        print_error(str(error))
         return
 
     print_success("Contrat créé avec succès.")
@@ -91,15 +99,16 @@ def update_contract_from_menu(
 
     update_data = ask_contract_update_data()
 
-    updated_contract = update_contract(
-        session=session,
-        current_user=current_user,
-        contract=contract,
-        **update_data,
-    )
+    try:
+        update_contract(
+            session=session,
+            current_user=current_user,
+            contract=contract,
+            **update_data,
+        )
 
-    if updated_contract is None:
-        print_error("Modification contrat impossible : permission refusée ou données invalides.")
+    except EpicEventsError as error:
+        print_error(str(error))
         return
 
     print_success("Contrat modifié avec succès.")
@@ -118,17 +127,18 @@ def delete_contract_from_menu(
         print_error("Contrat introuvable.")
         return
 
-    deleted = delete_contract(
-        session=session,
-        current_user=current_user,
-        contract=contract,
-    )
+    try:
+        delete_contract(
+            session=session,
+            current_user=current_user,
+            contract=contract,
+        )
 
-    if deleted:
-        print_success("Contrat supprimé avec succès.")
+    except EpicEventsError as error:
+        print_error(str(error))
         return
 
-    print_error("Suppression contrat refusée.")
+    print_success("Contrat supprimé avec succès")
 
 
 def run_contract_menu() -> None:

@@ -137,6 +137,7 @@ def test_other_commercial_cannot_update_customer(
     commercial_user,
     other_commercial_user,
 ):
+
     customer = create_customer(
         session=test_session,
         current_user=commercial_user,
@@ -146,15 +147,13 @@ def test_other_commercial_cannot_update_customer(
         company_name="Cool Startup LLC",
     )
 
-    updated_customer = update_customer(
-        session=test_session,
-        current_user=other_commercial_user,
-        customer=customer,
-        phone="+33600000000",
-    )
-
-    assert updated_customer is None
-    assert customer.phone == "+67812345678"
+    with pytest.raises(PermissionDeniedError):
+        update_customer(
+            session=test_session,
+            current_user=other_commercial_user,
+            customer=customer,
+            phone="+33600000000",
+        )
 
 
 def test_management_can_delete_customer(
@@ -187,6 +186,7 @@ def test_commercial_cannot_delete_customer(
     test_session,
     commercial_user,
 ):
+
     customer = create_customer(
         session=test_session,
         current_user=commercial_user,
@@ -196,13 +196,9 @@ def test_commercial_cannot_delete_customer(
         company_name="Cool Startup LLC",
     )
 
-    result = delete_customer(
-        session=test_session,
-        current_user=commercial_user,
-        customer=customer,
-    )
-
-    existing_customer = get_customer_by_id(test_session, customer.id_customer)
-
-    assert result is False
-    assert existing_customer is not None
+    with pytest.raises(PermissionDeniedError):
+        delete_customer(
+            session=test_session,
+            current_user=commercial_user,
+            customer=customer,
+        )

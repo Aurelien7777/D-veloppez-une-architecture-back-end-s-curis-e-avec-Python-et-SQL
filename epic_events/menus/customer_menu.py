@@ -1,8 +1,9 @@
 """Customer terminal menu."""
 
 from sqlalchemy.orm import Session
+from epic_events.controllers.permission_controller import can_create_customer
 
-from epic_events.controllers.customer_controller import (
+from epic_events.controllers.customer_controller import(
     create_customer,
     delete_customer,
     get_all_customers,
@@ -21,7 +22,7 @@ from epic_events.views.customer_view import (
     display_customers,
 )
 
-from epic_events.exceptions import InvalidDataError, PermissionDeniedError
+from epic_events.exceptions import EpicEventsError
 
 
 def show_all_customers(session: Session) -> None:
@@ -37,6 +38,10 @@ def create_customer_from_menu(
 ) -> None:
     """Ask customer data and create a customer."""
 
+    if not can_create_customer(current_user):
+        print_error("Seul un commercial peut créer un client.")
+        return
+
     customer_data = ask_customer_data()
     try:
         create_customer(
@@ -45,14 +50,11 @@ def create_customer_from_menu(
             **customer_data,
         )
 
-    except PermissionDeniedError as error:
-        print_error(str(error))
-
-    except InvalidDataError as error:
+    except EpicEventsError as error:
         print_error(str(error))
         return
-
-    print_success("Client créé avec succès.")
+    else:
+        print_success("Client créé avec succès.")
 
 
 def update_customer_from_menu(
@@ -70,15 +72,15 @@ def update_customer_from_menu(
 
     update_data = ask_customer_update_data()
 
-    updated_customer = update_customer(
-        session=session,
-        current_user=current_user,
-        customer=customer,
-        **update_data,
-    )
-
-    if updated_customer is None:
-        print_error("Modification refusée ou données invalides.")
+    try:
+        update_customer(
+            session=session,
+            current_user=current_user,
+            customer=customer,
+            **update_data,
+        )
+    except EpicEventsError as error:
+        print_error(str(error))
         return
 
     print_success("Client modifié avec succès.")
@@ -96,18 +98,18 @@ def delete_customer_from_menu(
     if customer is None:
         print_error("Client introuvable.")
         return
+    try:
+        delete_customer(
+            session=session,
+            current_user=current_user,
+            customer=customer,
+        )
+    except EpicEventsError as error:
+        print_error(str(error))
 
-    deleted = delete_customer(
-        session=session,
-        current_user=current_user,
-        customer=customer,
-    )
-
-    if deleted:
-        print_success("Client supprimé avec succès.")
         return
 
-    print_error("Suppression refusée.")
+    print_success("Client supprimé avec succès.")
 
 
 def run_customer_menu() -> None:

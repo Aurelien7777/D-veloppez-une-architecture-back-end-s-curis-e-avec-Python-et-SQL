@@ -14,7 +14,11 @@ from epic_events.controllers.permission_controller import (
 from epic_events.models.model import Contract, Event, User
 from epic_events.repositories import event_repository
 from epic_events.validators import validate_event_data
-
+from epic_events.exceptions import (
+    BusinessRuleError, 
+    InvalidDataError, 
+    PermissionDeniedError
+)
 
 def get_all_events(session: Session) -> list[Event]:
     """Return all events."""
@@ -56,17 +60,19 @@ def create_event(
     location: str,
     attendees: int,
     notes: Optional[str] = None,
-) -> Optional[Event]:
+) -> Event:
     """Create an event for a signed contract."""
+    
+    if contract.event is not None:
+        raise BusinessRuleError("Un événement existe déjà pour ce contrat.")
+    
+    if not validate_event_data(name, start_date, end_date, location, attendees):
+        raise InvalidDataError("Les données de l'événement sont invalides.")
 
     if not can_create_event(current_user, contract):
-        return None
-
-    if not validate_event_data(name, start_date, end_date, location, attendees):
-        return None
-
-    if contract.event is not None:
-        return None
+        raise PermissionDeniedError(
+            "Vous n'êtes pas autorisé à créer un événement pour ce contrat."
+        )
 
     event = Event(
         name=name,
@@ -94,13 +100,15 @@ def assign_support_to_event(
     """Assign a support user to an event."""
 
     if not can_assign_support_to_event(current_user):
-        return None
+        raise PermissionDeniedError(
+            "Vous n'êtes pas autorisé à créer un événement pour ce contrat."
+        )
 
     try:
         event.assign_support(support_user)
 
-    except ValueError:
-        return None
+    except ValueError as error:
+        raise InvalidDataError("L'utilisateur assigné doit être un support.") from error
 
     session.commit()
 
@@ -117,14 +125,14 @@ def update_event(
     location: Optional[str] = None,
     attendees: Optional[int] = None,
     notes: Optional[str] = None,
-) -> Optional[Event]:
+) -> Event:
     """Update selected event fields if current user is allowed."""
 
     if not can_update_event(current_user, event):
-        return None
+        raise PermissionDeniedError("Vous n'êtes pas autorisé à modifier cet événement.")
 
     if not validate_event_data(name, start_date, end_date, location, attendees):
-        return None
+        raise InvalidDataError("Les données de l'événement sont invalides.")
 
     event.update_event_info(
         name=name,
@@ -148,7 +156,7 @@ def delete_event(
     """Delete an event if current user is allowed."""
 
     if not can_delete_event(current_user):
-        return False
+        raise PermissionDeniedError("Vous n'êtes pas autorisé à supprimer cet événement.")
 
     deleted = event_repository.delete_event(session, event)
     session.commit()

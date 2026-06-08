@@ -1,5 +1,7 @@
+import pytest
 from decimal import Decimal
 
+from epic_events.exceptions import PermissionDeniedError
 from epic_events.controllers.contract_controller import (
     create_contract,
     delete_contract,
@@ -95,16 +97,15 @@ def test_commercial_cannot_create_contract(
 ):
     customer = create_test_customer(test_session, commercial_user)
 
-    contract = create_contract(
-        session=test_session,
-        current_user=commercial_user,
-        customer=customer,
-        total_amount=Decimal("1000.00"),
-        remaining_amount=Decimal("500.00"),
-        is_signed=False,
-    )
-
-    assert contract is None
+    with pytest.raises(PermissionDeniedError):
+        create_contract(
+            session=test_session,
+            current_user=commercial_user,
+            customer=customer,
+            total_amount=Decimal("1000.00"),
+            remaining_amount=Decimal("500.00"),
+            is_signed=False,
+        )
 
 
 def test_management_can_update_contract(
@@ -180,15 +181,13 @@ def test_commercial_cannot_update_other_commercial_contract(
         is_signed=False,
     )
 
-    updated_contract = update_contract(
-        session=test_session,
-        current_user=other_commercial_user,
-        contract=contract,
-        remaining_amount=Decimal("0.00"),
-    )
-
-    assert updated_contract is None
-    assert contract.remaining_amount == Decimal("500.00")
+    with pytest.raises(PermissionDeniedError):
+        update_contract(
+            session=test_session,
+            current_user=other_commercial_user,
+            contract=contract,
+            remaining_amount=Decimal("0.00"),
+        )
 
 
 def test_support_cannot_update_contract(
@@ -207,16 +206,13 @@ def test_support_cannot_update_contract(
         remaining_amount=Decimal("500.00"),
         is_signed=False,
     )
-
-    updated_contract = update_contract(
-        session=test_session,
-        current_user=support_user,
-        contract=contract,
-        is_signed=True,
-    )
-
-    assert updated_contract is None
-    assert contract.is_signed is False
+    with pytest.raises(PermissionDeniedError):
+        update_contract(
+            session=test_session,
+            current_user=support_user,
+            contract=contract,
+            is_signed=True,
+        )
 
 
 def test_get_unsigned_contracts_returns_only_unsigned_contracts(
@@ -325,13 +321,9 @@ def test_commercial_cannot_delete_contract(
         is_signed=False,
     )
 
-    result = delete_contract(
-        session=test_session,
-        current_user=commercial_user,
-        contract=contract,
-    )
-
-    existing_contract = get_contract_by_id(test_session, contract.id_contract)
-
-    assert result is False
-    assert existing_contract is not None
+    with pytest.raises(PermissionDeniedError):
+        delete_contract(
+            session=test_session,
+            current_user=commercial_user,
+            contract=contract,
+        )

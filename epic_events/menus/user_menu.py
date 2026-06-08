@@ -4,6 +4,8 @@ from typing import Optional
 
 from sqlalchemy.orm import Session
 
+from epic_events.exceptions import InvalidDataError, PermissionDeniedError
+from epic_events.controllers.permission_controller import can_manage_users
 from epic_events.controllers.token_controller import get_current_user
 from epic_events.controllers.user_controller import (
     create_user,
@@ -56,6 +58,10 @@ def create_user_from_menu(
 ) -> None:
     """Ask user data and create a user."""
 
+    if not can_manage_users(current_user):
+        print_error("Seul un membre de la gestion peut créer un utilisateur.")
+        return
+
     user_data = ask_user_data()
     role = get_role_from_menu(session, user_data["role_name"])
 
@@ -85,6 +91,8 @@ def update_user_from_menu(
 ) -> None:
     """Ask user data and update a user."""
 
+    if not can_manage_users(current_user):
+        print_error("Seul un membre de la gestion peut modifier un utilisateur.")
     id_user = ask_user_id()
     user = get_user_by_id(session, id_user)
 

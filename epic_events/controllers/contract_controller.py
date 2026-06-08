@@ -14,6 +14,7 @@ from epic_events.controllers.permission_controller import (
 from epic_events.models.model import Contract, Customer, User
 from epic_events.repositories import contract_repository
 from epic_events.validators import validate_contract_data
+from epic_events.exceptions import InvalidDataError, PermissionDeniedError
 
 
 def get_all_contracts(session: Session) -> list[Contract]:
@@ -50,14 +51,14 @@ def create_contract(
     total_amount: Decimal,
     remaining_amount: Decimal,
     is_signed: bool = False,
-) -> Optional[Contract]:
+) -> Contract:
     """Create a contract linked to a customer."""
 
     if not can_create_contract(current_user):
-        return None
+        raise PermissionDeniedError("Seul un membre de la gestion peut créer un contrat")
 
     if not validate_contract_data(total_amount, remaining_amount):
-        return None
+        raise InvalidDataError("Les données du contrat sont invalides.")
 
     contract = Contract(
         total_amount=total_amount,
@@ -79,14 +80,14 @@ def update_contract(
     total_amount: Optional[Decimal] = None,
     remaining_amount: Optional[Decimal] = None,
     is_signed: Optional[bool] = None,
-) -> Optional[Contract]:
+) -> Contract:
     """Update selected contract fields if current user is allowed."""
 
     if not can_update_contract(current_user, contract):
-        return None
+        raise PermissionDeniedError("Vous n'êtes pas autorisé à modifier ce contrat.")
 
     if not validate_contract_data(total_amount, remaining_amount):
-        return None
+        raise InvalidDataError("Les données du contrat sont invalides.")
 
     contract.update_contract_info(
         total_amount=total_amount,
@@ -107,7 +108,7 @@ def delete_contract(
     """Delete a contract if current user is allowed."""
 
     if not can_delete_contract(current_user):
-        return False
+        raise PermissionDeniedError("Vous n'êtes pas autorisé à supprimer ce contrat.")
 
     deleted = contract_repository.delete_contract(session, contract)
     session.commit()

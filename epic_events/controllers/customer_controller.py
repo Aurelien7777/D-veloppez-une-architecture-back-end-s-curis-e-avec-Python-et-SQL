@@ -71,14 +71,14 @@ def update_customer(
     email: Optional[str] = None,
     phone: Optional[str] = None,
     company_name: Optional[str] = None,
-) -> Optional[Customer]:
+) -> Customer:
     """Update selected customer fields if current user is allowed."""
 
     if not can_update_customer(current_user, customer):
-        return None
+        raise PermissionDeniedError("Vous n'êtes pas autorisé à modifier ce client.")
 
     if not validate_customer_data(full_name, email, phone, company_name):
-        return None
+        raise InvalidDataError("Les données du client sont invalides.")
 
     customer.update_contact_info(
         full_name=full_name,
@@ -100,7 +100,7 @@ def delete_customer(
     """Delete a customer if current user is allowed."""
 
     if not can_delete_customer(current_user):
-        return False
+        raise PermissionDeniedError("Vous n'etes pas autoriser à supprimer ce client")
 
     deleted = customer_repository.delete_customer(session, customer)
     session.commit()

@@ -2,6 +2,8 @@
 
 from sqlalchemy.orm import Session
 
+from epic_events.exceptions import EpicEventsError
+from epic_events.controllers.permission_controller import can_create_event
 from epic_events.controllers.contract_controller import get_contract_by_id
 from epic_events.controllers.event_controller import (
     assign_support_to_event,
@@ -68,16 +70,16 @@ def create_event_from_menu(
 
     event_data = ask_event_data()
 
-    event = create_event(
-        session=session,
-        current_user=current_user,
-        contract=contract,
-        **event_data,
-    )
+    try:
+        create_event(
+            session=session,
+            current_user=current_user,
+            contract=contract,
+            **event_data,
+        )
+    except EpicEventsError as error:
+        print_error(str(error))
 
-    if event is None:
-        print_error("Création événement impossible : permission refusée ou données invalides.")
-        return
 
     print_success("Événement créé avec succès.")
 
@@ -102,16 +104,15 @@ def assign_support_from_menu(
         print_error("Collaborateur introuvable.")
         return
 
-    updated_event = assign_support_to_event(
-        session=session,
-        current_user=current_user,
-        event=event,
-        support_user=support_user,
-    )
-
-    if updated_event is None:
-        print_error("Assignation impossible : permission refusée ou rôle invalide.")
-        return
+    try:
+        assign_support_to_event(
+            session=session,
+            current_user=current_user,
+            event=event,
+            support_user=support_user,
+        )
+    except EpicEventsError as error:
+        print_error(str(error))
 
     print_success("Support assigné avec succès.")
 
