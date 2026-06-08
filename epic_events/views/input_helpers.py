@@ -102,7 +102,8 @@ def ask_datetime(label: str, date_format: str = "%Y-%m-%d %H:%M") -> datetime:
     """Ask a datetime value until input is valid."""
 
     while True:
-        value = input(f"{label} ({date_format}) : ").strip()
+        # value = input(f"{label} ({date_format}) : ").strip()
+        value = input(f"{label} : ").strip()
 
         try:
             return datetime.strptime(value, date_format)
@@ -118,7 +119,8 @@ def ask_optional_datetime(
     """Ask an optional datetime value."""
 
     while True:
-        value = input(f"{label} ({date_format}) : ").strip()
+        # value = input(f"{label} ({date_format}) : ").strip()
+        value = input(f"{label} : ").strip()
 
         if not value:
             return None

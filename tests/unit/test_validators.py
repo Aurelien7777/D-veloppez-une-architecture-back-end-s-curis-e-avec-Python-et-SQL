@@ -68,7 +68,7 @@ def test_validate_customer_data():
         validate_customer_data(
             full_name="Kevin Casey",
             email="kevin@startup.io",
-            phone="+33612345678",
+            phone="0612345678",
             company_name="Cool Startup LLC",
         )
         is True
@@ -98,7 +98,7 @@ def test_validate_contract_data():
 
 
 def test_validate_event_data():
-    start_date = datetime.now()
+    start_date = datetime.now() + timedelta(days=1)
     end_date = start_date + timedelta(hours=2)
 
     assert (
@@ -132,3 +132,30 @@ def test_validate_user_data():
     assert validate_user_data(email="bad-email") is False
     assert validate_user_data(password="short") is False
     assert validate_user_data(role_name="admin") is False
+
+
+@pytest.mark.parametrize(
+    "phone",
+    [
+        "0612345678",
+        "06 12 34 56 78",
+        "06-12-34-56-78",
+        "+33612345678",
+        "+33 6 12 34 56 78",
+    ],
+)
+def test_french_phone_is_valid(phone):
+    assert is_valid_phone(phone) is True
+
+
+@pytest.mark.parametrize(
+    "phone",
+    [
+        "123456",
+        "0012345678",
+        "+330612345678",
+        "+999123456789",
+    ],
+)
+def test_invalid_french_phone_is_invalid(phone):
+    assert is_valid_phone(phone) is False

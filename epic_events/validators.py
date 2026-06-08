@@ -7,6 +7,7 @@ from typing import Optional
 
 EMAIL_PATTERN = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 PHONE_PATTERN = re.compile(r"^\+?[0-9\s\-().]{6,30}$")
+FRENCH_PHONE_PATTERN = re.compile(r"^(?:0[1-9]\d{8}|\+33[1-9]\d{8})$")
 VALID_ROLES = {"management", "commercial", "support"}
 
 
@@ -24,8 +25,18 @@ def is_valid_email(email: str) -> bool:
 
 def is_valid_phone(phone: str) -> bool:
     """Return True if phone has a valid basic format."""
+    if not phone:
+        return False
 
-    return bool(phone and PHONE_PATTERN.match(phone))
+    normalized_phone = normalize_phone(phone)
+
+    return bool(FRENCH_PHONE_PATTERN.match(normalized_phone))
+
+
+def normalize_phone(phone: str) -> str:
+    """Return phone number without common separators."""
+
+    return re.sub(r"[\s\-().]", "", phone)
 
 
 def is_positive_decimal(value: Decimal) -> bool:
@@ -44,6 +55,12 @@ def is_valid_date_range(start_date: datetime, end_date: datetime) -> bool:
     """Return True if end date is after start date."""
 
     return end_date > start_date
+
+
+def is_future_date(value: datetime) -> bool:
+    """Return True if date is in the future."""
+
+    return value > datetime.now()
 
 
 def is_valid_role_name(role_name: str) -> bool:
@@ -118,6 +135,9 @@ def validate_event_data(
     if start_date is not None and end_date is not None:
         if not is_valid_date_range(start_date, end_date):
             return False
+
+    if start_date is not None and not is_future_date(start_date):
+        return False
 
     return True
 

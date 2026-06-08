@@ -22,7 +22,7 @@ def create_test_customer(test_session, commercial_user):
         current_user=commercial_user,
         full_name="Kevin Casey",
         email="kevin@startup.io",
-        phone="+67812345678",
+        phone="0678123456",
         company_name="Cool Startup LLC",
     )
 

@@ -3,8 +3,11 @@
 from sqlalchemy.orm import Session
 
 from epic_events.exceptions import EpicEventsError
-from epic_events.controllers.permission_controller import can_create_event
 from epic_events.controllers.contract_controller import get_contract_by_id
+from epic_events.controllers.permission_controller import (
+    can_create_event,
+    can_assign_support_to_event,
+)
 from epic_events.controllers.event_controller import (
     assign_support_to_event,
     create_event,
@@ -64,6 +67,10 @@ def create_event_from_menu(
     id_contract = ask_event_contract_id()
     contract = get_contract_by_id(session, id_contract)
 
+    if not can_create_event(current_user, contract):
+        print_error("Seul un commercial en gestion du client peut créer un évènement.")
+        return
+
     if contract is None:
         print_error("Contrat introuvable.")
         return
@@ -79,7 +86,7 @@ def create_event_from_menu(
         )
     except EpicEventsError as error:
         print_error(str(error))
-
+        return
     print_success("Événement créé avec succès.")
 
 
@@ -88,6 +95,9 @@ def assign_support_from_menu(
     current_user: User,
 ) -> None:
     """Ask event and support user ids, then assign support."""
+
+    if not can_assign_support_to_event(current_user):
+        print_error("Seul les membres du service gestion peuvent assigner un support")
 
     id_event = ask_event_id()
     event = get_event_by_id(session, id_event)
@@ -112,6 +122,7 @@ def assign_support_from_menu(
         )
     except EpicEventsError as error:
         print_error(str(error))
+        return
 
     print_success("Support assigné avec succès.")
 
@@ -130,14 +141,24 @@ def update_event_from_menu(
         return
 
     update_data = ask_event_update_data()
+    support_user_id = update_data.pop("support_user_id")
+    support_user = None
+
+    if support_user_id is not None:
+        support_user = get_user_by_id(session, support_user_id)
+
+        if support_user is None:
+            print_error("Collaborateur support introuvable.")
+            return
 
     try:
         update_event(
-        session=session,
-        current_user=current_user,
-        event=event,
-        **update_data,
-    )
+            session=session,
+            current_user=current_user,
+            event=event,
+            support_user=support_user,
+            **update_data,
+        )
 
     except EpicEventsError as error:
         print_error(str(error))
@@ -159,17 +180,17 @@ def delete_event_from_menu(
         print_error("Événement introuvable.")
         return
 
-    deleted = delete_event(
-        session=session,
-        current_user=current_user,
-        event=event,
-    )
-
-    if deleted:
-        print_success("Événement supprimé avec succès.")
+    try:
+        delete_event(
+            session=session,
+            current_user=current_user,
+            event=event,
+        )
+    except EpicEventsError as error:
+        print_error(str(error))
         return
 
-    print_error("Suppression événement refusée.")
+    print_success("Événement supprimé avec succès.")
 
 
 def run_event_menu() -> None:

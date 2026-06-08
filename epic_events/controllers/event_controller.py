@@ -101,11 +101,14 @@ def assign_support_to_event(
             "Vous n'êtes pas autorisé à créer un événement pour ce contrat."
         )
 
+    if event.id_support == support_user.id_user:
+        raise BusinessRuleError("Ce support est déjà assigné à cet événement.")
+
     try:
         event.assign_support(support_user)
 
     except ValueError as error:
-        raise InvalidDataError("L'utilisateur assigné doit être un support.") from error
+        raise InvalidDataError("L'utilisateur assigné doit être du support.") from error
 
     session.commit()
 
@@ -122,6 +125,7 @@ def update_event(
     location: Optional[str] = None,
     attendees: Optional[int] = None,
     notes: Optional[str] = None,
+    support_user: Optional[User] = None,
 ) -> Event:
     """Update selected event fields if current user is allowed."""
 
@@ -140,6 +144,21 @@ def update_event(
         notes=notes,
     )
 
+    if support_user is not None:
+        if not can_assign_support_to_event(current_user):
+            raise PermissionDeniedError(
+                "Vous n'êtes pas autorisé à modifier le support de cet événement."
+            )
+
+        if event.id_support == support_user.id_user:
+            raise BusinessRuleError("Ce support est déjà assigné à cet événement.")
+
+        try:
+            event.assign_support(support_user)
+
+        except ValueError as error:
+            raise InvalidDataError("L'utilisateur assigné doit être un support.") from error
+
     session.commit()
 
     return event
@@ -154,6 +173,7 @@ def delete_event(
 
     if not can_delete_event(current_user):
         raise PermissionDeniedError("Vous n'êtes pas autorisé à supprimer cet événement.")
+        return
 
     deleted = event_repository.delete_event(session, event)
     session.commit()

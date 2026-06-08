@@ -53,6 +53,7 @@ def create_customer_from_menu(
     except EpicEventsError as error:
         print_error(str(error))
         return
+
     else:
         print_success("Client créé avec succès.")
 
@@ -98,6 +99,7 @@ def delete_customer_from_menu(
     if customer is None:
         print_error("Client introuvable.")
         return
+
     try:
         delete_customer(
             session=session,
@@ -106,7 +108,6 @@ def delete_customer_from_menu(
         )
     except EpicEventsError as error:
         print_error(str(error))
-
         return
 
     print_success("Client supprimé avec succès.")

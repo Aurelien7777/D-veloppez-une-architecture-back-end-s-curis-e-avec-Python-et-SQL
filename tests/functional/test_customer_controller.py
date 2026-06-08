@@ -19,7 +19,7 @@ def test_get_all_customers_returns_customers(
         current_user=commercial_user,
         full_name="Kevin Casey",
         email="kevin@startup.io",
-        phone="+67812345678",
+        phone="0678123456",
         company_name="Cool Startup LLC",
     )
 
@@ -37,7 +37,7 @@ def test_get_customer_by_id_returns_customer(
         current_user=commercial_user,
         full_name="Kevin Casey",
         email="kevin@startup.io",
-        phone="+67812345678",
+        phone="0678123456",
         company_name="Cool Startup LLC",
     )
 
@@ -56,7 +56,7 @@ def test_create_customer_with_commercial_user(
         current_user=commercial_user,
         full_name="Kevin Casey",
         email="kevin@startup.io",
-        phone="+67812345678",
+        phone="0678123456",
         company_name="Cool Startup LLC",
     )
 
@@ -75,7 +75,7 @@ def test_create_customer_with_support_user_returns_none(
             current_user=support_user,
             full_name="Kevin Casey",
             email="kevin@startup.io",
-            phone="+67812345678",
+            phone="0678123456",
             company_name="Cool Startup LLC",
         )
 
@@ -89,7 +89,7 @@ def test_update_customer_can_update_one_field(
         current_user=commercial_user,
         full_name="Kevin Casey",
         email="kevin@startup.io",
-        phone="+67812345678",
+        phone="0678123456",
         company_name="Cool Startup LLC",
     )
 
@@ -97,11 +97,11 @@ def test_update_customer_can_update_one_field(
         session=test_session,
         current_user=commercial_user,
         customer=customer,
-        phone="+33600000000",
+        phone="0600000000",
     )
 
     assert updated_customer is not None
-    assert updated_customer.phone == "+33600000000"
+    assert updated_customer.phone == "0600000000"
     assert updated_customer.email == "kevin@startup.io"
 
 
@@ -114,7 +114,7 @@ def test_update_customer_can_update_multiple_fields(
         current_user=commercial_user,
         full_name="Kevin Casey",
         email="kevin@startup.io",
-        phone="+67812345678",
+        phone="0678123456",
         company_name="Cool Startup LLC",
     )
 
@@ -129,7 +129,7 @@ def test_update_customer_can_update_multiple_fields(
     assert updated_customer is not None
     assert updated_customer.email == "new.kevin@startup.io"
     assert updated_customer.company_name == "New Startup LLC"
-    assert updated_customer.phone == "+67812345678"
+    assert updated_customer.phone == "0678123456"
 
 
 def test_other_commercial_cannot_update_customer(
@@ -143,7 +143,7 @@ def test_other_commercial_cannot_update_customer(
         current_user=commercial_user,
         full_name="Kevin Casey",
         email="kevin@startup.io",
-        phone="+67812345678",
+        phone="0678123456",
         company_name="Cool Startup LLC",
     )
 
@@ -152,7 +152,7 @@ def test_other_commercial_cannot_update_customer(
             session=test_session,
             current_user=other_commercial_user,
             customer=customer,
-            phone="+33600000000",
+            phone="0640302010",
         )
 
 
@@ -166,7 +166,7 @@ def test_management_can_delete_customer(
         current_user=commercial_user,
         full_name="Kevin Casey",
         email="kevin@startup.io",
-        phone="+67812345678",
+        phone="0678123456",
         company_name="Cool Startup LLC",
     )
 
@@ -192,7 +192,7 @@ def test_commercial_cannot_delete_customer(
         current_user=commercial_user,
         full_name="Kevin Casey",
         email="kevin@startup.io",
-        phone="+67812345678",
+        phone="0678123456",
         company_name="Cool Startup LLC",
     )
 

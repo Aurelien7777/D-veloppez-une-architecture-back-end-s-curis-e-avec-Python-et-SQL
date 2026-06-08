@@ -92,4 +92,5 @@ def ask_event_update_data() -> dict:
         "location": input("Nouveau lieu : ") or None,
         "attendees": ask_optional_int("Nouveau nombre de participants : "),
         "notes": input("Nouvelles notes : ") or None,
+        "support_user_id": ask_optional_int("Nouvel ID support : "),
     }

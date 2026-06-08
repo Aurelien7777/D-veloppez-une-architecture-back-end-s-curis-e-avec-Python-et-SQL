@@ -3,6 +3,7 @@
 from sqlalchemy.orm import Session
 
 from epic_events.controllers.permission_controller import can_create_contract
+
 from epic_events.controllers.contract_controller import (
     create_contract,
     delete_contract,

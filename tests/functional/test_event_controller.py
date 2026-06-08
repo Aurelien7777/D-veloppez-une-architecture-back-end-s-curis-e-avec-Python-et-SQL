@@ -30,7 +30,7 @@ def create_test_customer(test_session, commercial_user):
         current_user=commercial_user,
         full_name="Kevin Casey",
         email="kevin.event@startup.io",
-        phone="+67812345678",
+        phone="0678123456",
         company_name="Cool Startup LLC",
     )
 
@@ -162,6 +162,32 @@ def test_cannot_create_two_events_for_same_contract(
         create_test_event(test_session, commercial_user, contract)
 
     assert first_event is not None
+
+
+def test_management_cannot_assign_same_support_twice(
+    test_session,
+    management_user,
+    commercial_user,
+    support_user,
+):
+    customer = create_test_customer(test_session, commercial_user)
+    contract = create_test_contract(test_session, management_user, customer)
+    event = create_test_event(test_session, commercial_user, contract)
+
+    assign_support_to_event(
+        session=test_session,
+        current_user=management_user,
+        event=event,
+        support_user=support_user,
+    )
+
+    with pytest.raises(BusinessRuleError):
+        assign_support_to_event(
+            session=test_session,
+            current_user=management_user,
+            event=event,
+            support_user=support_user,
+        )
 
 
 def test_management_can_assign_support_to_event(
