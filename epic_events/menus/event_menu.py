@@ -131,15 +131,16 @@ def update_event_from_menu(
 
     update_data = ask_event_update_data()
 
-    updated_event = update_event(
+    try:
+        update_event(
         session=session,
         current_user=current_user,
         event=event,
         **update_data,
     )
 
-    if updated_event is None:
-        print_error("Modification événement impossible : permission refusée ou données invalides.")
+    except EpicEventsError as error:
+        print_error(str(error))
         return
 
     print_success("Événement modifié avec succès.")

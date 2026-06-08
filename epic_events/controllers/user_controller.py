@@ -49,7 +49,7 @@ def create_user(
     employee_number: str,
     password: str,
     role: Role,
-) -> Optional[User]:
+) -> User:
     """Create a user if current user is allowed."""
 
     if not can_manage_users(current_user):
@@ -87,7 +87,7 @@ def update_user(
     employee_number: Optional[str] = None,
     password: Optional[str] = None,
     role: Optional[Role] = None,
-) -> Optional[User]:
+) -> User:
     """Update selected user fields if current user is allowed."""
 
     if not can_manage_users(current_user):

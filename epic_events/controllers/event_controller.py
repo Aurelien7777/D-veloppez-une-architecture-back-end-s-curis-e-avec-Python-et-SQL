@@ -93,7 +93,7 @@ def assign_support_to_event(
     current_user: User,
     event: Event,
     support_user: User,
-) -> Optional[Event]:
+) -> Event:
     """Assign a support user to an event."""
 
     if not can_assign_support_to_event(current_user):
