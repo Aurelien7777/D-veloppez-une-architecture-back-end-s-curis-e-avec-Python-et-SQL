@@ -77,13 +77,13 @@ def create_user(
     try:
         user_repository.save_user(session, user)
         session.commit()
-        
+
     except IntegrityError as error:
         session.rollback()
         raise InvalidDataError(
-        "Un collaborateur avec cet email ou ce numéro employé existe déjà."
+            "Un collaborateur avec cet email ou ce numéro employé existe déjà."
         ) from error
-    
+
     log_user_created(
         created_user_id=user.id_user,
         created_user_role=user.role.name,
@@ -131,7 +131,7 @@ def update_user(
     )
     try:
         session.commit()
-    
+
     except IntegrityError as error:
         session.rollback()
         raise InvalidDataError(

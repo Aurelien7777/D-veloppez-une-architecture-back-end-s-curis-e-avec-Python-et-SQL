@@ -63,7 +63,7 @@ def create_customer(
         session.commit()
     except IntegrityError as error:
         session.rollback()
-        raise InvalidDataError("Un client avec cet email existe déjà")from error
+        raise InvalidDataError("Un client avec cet email existe déjà") from error
 
     return customer
 
@@ -93,7 +93,7 @@ def update_customer(
     )
     try:
         session.commit()
-    
+
     except IntegrityError as error:
         session.rollback()
         raise InvalidDataError("Un client avec cet email existe déjà.") from error
