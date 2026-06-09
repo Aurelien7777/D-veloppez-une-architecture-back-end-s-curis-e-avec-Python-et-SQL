@@ -35,12 +35,17 @@ def get_jwt_expiration_hours() -> int:
 
     return int(config.get("JWT_EXPIRATION_HOURS", 8))
 
+def get_jwt_expiration_minutes() -> int:
+    """Return JWT expiration duration in hours."""
+
+    return int(config.get("JWT_EXPIRATION_MINUTES", 30))
+
 
 def create_token(user: User) -> str:
     """Create a JWT for an authenticated user."""
 
     now = datetime.now(tz=timezone.utc)
-    expiration_date = now + timedelta(hours=get_jwt_expiration_hours())
+    expiration_date = now + timedelta(minutes=get_jwt_expiration_minutes())
 
     payload = {
         "sub": str(user.id_user),
