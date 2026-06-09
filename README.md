@@ -45,7 +45,7 @@ Le projet permet aux collaborateurs de g√©rer les clients, les contrats et les √
 Cloner le repository :
 
 ```bash
-git clone <url-du-repository>
+git clone https://github.com/Aurelien7777/D-veloppez-une-architecture-back-end-s-curis-e-avec-Python-et-SQL.git
 cd projet_epic_events
 ```
 

@@ -23,9 +23,24 @@ def create_roles(session):
             role = Role(name=role_name)
             session.add(role)
 
+def management_user_exists(session) -> bool:
+    """Return True if at least one management user already exists."""
+
+    statement = (
+        select(User)
+        .join(Role)
+        .where(Role.name == "management")
+    )
+
+    return session.scalars(statement).first() is not None
+
 
 def create_first_management_user(session):
     """Create the first management user."""
+    
+    if management_user_exists(session):
+        print("A management user already exists.")
+        return
 
     email = input("Email: ")
     full_name = input("Full name: ")
