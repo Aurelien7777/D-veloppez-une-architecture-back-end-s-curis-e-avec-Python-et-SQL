@@ -67,12 +67,12 @@ def create_event_from_menu(
     id_contract = ask_event_contract_id()
     contract = get_contract_by_id(session, id_contract)
 
-    if not can_create_event(current_user, contract):
-        print_error("Seul un commercial en gestion du client peut créer un évènement.")
-        return
-
     if contract is None:
         print_error("Contrat introuvable.")
+        return
+
+    if not can_create_event(current_user, contract):
+        print_error("Seul un commercial en gestion du client peut créer un évènement.")
         return
 
     event_data = ask_event_data()
@@ -98,6 +98,7 @@ def assign_support_from_menu(
 
     if not can_assign_support_to_event(current_user):
         print_error("Seul les membres du service gestion peuvent assigner un support")
+        return
 
     id_event = ask_event_id()
     event = get_event_by_id(session, id_event)

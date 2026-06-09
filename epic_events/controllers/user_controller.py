@@ -3,6 +3,7 @@
 from typing import Optional
 
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 
 from epic_events.exceptions import (
     BusinessRuleError,
@@ -73,9 +74,16 @@ def create_user(
         role=role,
     )
 
-    user_repository.save_user(session, user)
-    session.commit()
-
+    try:
+        user_repository.save_user(session, user)
+        session.commit()
+        
+    except IntegrityError as error:
+        session.rollback()
+        raise InvalidDataError(
+        "Un collaborateur avec cet email ou ce numéro employé existe déjà."
+        ) from error
+    
     log_user_created(
         created_user_id=user.id_user,
         created_user_role=user.role.name,
@@ -121,8 +129,14 @@ def update_user(
         password_hash=password_hash,
         role=role,
     )
-
-    session.commit()
+    try:
+        session.commit()
+    
+    except IntegrityError as error:
+        session.rollback()
+        raise InvalidDataError(
+            "Un collaborateur avec cet email ou ce numéro employé existe déjà."
+        ) from error
 
     log_user_updated(
         updated_user_id=user.id_user,

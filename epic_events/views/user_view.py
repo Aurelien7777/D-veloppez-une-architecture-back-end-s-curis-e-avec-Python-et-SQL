@@ -5,6 +5,7 @@ from typing import Optional
 from epic_events.models.model import User
 from epic_events.views.console import print_info, print_title
 from epic_events.views.input_helpers import ask_int
+from getpass import getpass
 
 VALID_ROLES = ["management", "commercial", "support"]
 
@@ -73,7 +74,7 @@ def ask_user_data() -> dict:
         "full_name": input("Nom complet : "),
         "email": input("Email : "),
         "employee_number": input("Numéro employé : "),
-        "password": input("Mot de passe : "),
+        "password": getpass("Mot de passe : "),
         "role_name": ask_role_name(),
     }
 
@@ -87,6 +88,6 @@ def ask_user_update_data() -> dict:
         "full_name": input("Nouveau nom complet : ") or None,
         "email": input("Nouvel email : ") or None,
         "employee_number": input("Nouveau numéro employé : ") or None,
-        "password": input("Nouveau mot de passe : ") or None,
+        "password": getpass("Nouveau mot de passe : ") or None,
         "role_name": ask_optional_role_name(),
     }

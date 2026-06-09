@@ -71,6 +71,12 @@ def create_contract(
     contract_repository.save_contract(session, contract)
     session.commit()
 
+    if contract.is_signed:
+        log_contract_signed(
+            contract_id=contract.id_contract,
+            current_user_id=current_user.id_user,
+        )
+
     return contract
 
 
@@ -87,7 +93,12 @@ def update_contract(
     if not can_update_contract(current_user, contract):
         raise PermissionDeniedError("Vous n'êtes pas autorisé à modifier ce contrat.")
 
-    if not validate_contract_data(total_amount, remaining_amount):
+    new_total_amount = total_amount if total_amount is not None else contract.total_amount
+    new_remaining_amount = (
+        remaining_amount if remaining_amount is not None else contract.remaining_amount
+    )
+
+    if not validate_contract_data(new_total_amount, new_remaining_amount):
         raise InvalidDataError("Les données du contrat sont invalides.")
 
     was_unsigned = not contract.is_signed

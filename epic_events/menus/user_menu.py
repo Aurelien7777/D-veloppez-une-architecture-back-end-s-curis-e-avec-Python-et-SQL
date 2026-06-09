@@ -93,6 +93,7 @@ def update_user_from_menu(
 
     if not can_manage_users(current_user):
         print_error("Seul un membre de la gestion peut modifier un utilisateur.")
+        return
 
     id_user = ask_user_id()
     user = get_user_by_id(session, id_user)

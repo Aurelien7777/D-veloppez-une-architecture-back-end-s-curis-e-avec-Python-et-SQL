@@ -4,6 +4,7 @@ from datetime import datetime
 from typing import Optional
 
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 
 from epic_events.controllers.permission_controller import (
     can_create_customer,
@@ -57,8 +58,12 @@ def create_customer(
         id_commercial=current_user.id_user,
     )
 
-    customer_repository.save_customer(session, customer)
-    session.commit()
+    try:
+        customer_repository.save_customer(session, customer)
+        session.commit()
+    except IntegrityError as error:
+        session.rollback()
+        raise InvalidDataError("Un client avec cet email existe déjà")from error
 
     return customer
 
@@ -86,8 +91,12 @@ def update_customer(
         phone=phone,
         company_name=company_name,
     )
-
-    session.commit()
+    try:
+        session.commit()
+    
+    except IntegrityError as error:
+        session.rollback()
+        raise InvalidDataError("Un client avec cet email existe déjà.") from error
 
     return customer
 

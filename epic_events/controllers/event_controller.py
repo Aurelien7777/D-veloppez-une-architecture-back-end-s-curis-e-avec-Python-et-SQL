@@ -132,7 +132,19 @@ def update_event(
     if not can_update_event(current_user, event):
         raise PermissionDeniedError("Vous n'êtes pas autorisé à modifier cet événement.")
 
-    if not validate_event_data(name, start_date, end_date, location, attendees):
+    new_name = name if name is not None else event.name
+    new_start_date = start_date if start_date is not None else event.start_date
+    new_end_date = end_date if end_date is not None else event.end_date
+    new_location = location if location is not None else event.location
+    new_attendees = attendees if attendees is not None else event.attendees
+
+    if not validate_event_data(
+        name=new_name,
+        start_date=new_start_date,
+        end_date=new_end_date,
+        location=new_location,
+        attendees=new_attendees,
+    ):
         raise InvalidDataError("Les données de l'événement sont invalides.")
 
     event.update_event_info(
@@ -173,7 +185,6 @@ def delete_event(
 
     if not can_delete_event(current_user):
         raise PermissionDeniedError("Vous n'êtes pas autorisé à supprimer cet événement.")
-        return
 
     deleted = event_repository.delete_event(session, event)
     session.commit()
