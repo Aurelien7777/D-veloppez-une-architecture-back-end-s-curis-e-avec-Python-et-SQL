@@ -16,6 +16,7 @@ from epic_events.database import SessionLocal
 from epic_events.views.auth_view import ask_login_credentials
 from epic_events.views.console import print_error, print_info, print_success, print_title
 from epic_events.views.main_menu_view import display_main_menu
+from epic_events.monitoring import init_sentry
 
 
 def login() -> None:
@@ -108,6 +109,8 @@ def run_authenticated_menu() -> None:
 def main() -> None:
     """Run Epic Events CRM."""
 
+    init_sentry()
+
     while True:
         print_title("EPIC EVENTS CRM")
         print_info("1 - Se connecter")
@@ -127,4 +130,15 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+
+    except KeyboardInterrupt:
+        print_info("\nApplication interrompue.")
+
+    except Exception as error:
+        import sentry_sdk
+
+        sentry_sdk.capture_exception(error)
+        print_error("Une erreur inattendue est survenue.")
+        raise

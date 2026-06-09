@@ -11,7 +11,6 @@ from epic_events.controllers.customer_controller import (
 )
 from epic_events.exceptions import PermissionDeniedError
 
-
 CUSTOMER_DATA = {
     "full_name": "Kevin Casey",
     "email": "kevin@startup.io",
@@ -168,7 +167,7 @@ def test_management_can_delete_customer(
     assert deleted_customer is None
 
 
-@pytest.mark.parametrize(   
+@pytest.mark.parametrize(
     "user_fixture",
     [
         "commercial_user",

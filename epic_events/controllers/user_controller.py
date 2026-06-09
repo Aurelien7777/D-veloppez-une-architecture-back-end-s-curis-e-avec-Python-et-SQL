@@ -15,6 +15,7 @@ from epic_events.controllers.permission_controller import can_manage_users
 from epic_events.models.model import Role, User
 from epic_events.repositories import user_repository
 from epic_events.validators import validate_user_data
+from epic_events.monitoring import log_user_created, log_user_updated
 
 
 def get_all_users(session: Session) -> list[User]:
@@ -75,6 +76,12 @@ def create_user(
     user_repository.save_user(session, user)
     session.commit()
 
+    log_user_created(
+        created_user_id=user.id_user,
+        created_user_role=user.role.name,
+        current_user_id=current_user.id_user,
+    )
+
     return user
 
 
@@ -116,6 +123,11 @@ def update_user(
     )
 
     session.commit()
+
+    log_user_updated(
+        updated_user_id=user.id_user,
+        current_user_id=current_user.id_user,
+    )
 
     return user
 

@@ -15,6 +15,7 @@ from epic_events.models.model import Contract, Customer, User
 from epic_events.repositories import contract_repository
 from epic_events.validators import validate_contract_data
 from epic_events.exceptions import InvalidDataError, PermissionDeniedError
+from epic_events.monitoring import log_contract_signed
 
 
 def get_all_contracts(session: Session) -> list[Contract]:
@@ -89,6 +90,8 @@ def update_contract(
     if not validate_contract_data(total_amount, remaining_amount):
         raise InvalidDataError("Les données du contrat sont invalides.")
 
+    was_unsigned = not contract.is_signed
+
     contract.update_contract_info(
         total_amount=total_amount,
         remaining_amount=remaining_amount,
@@ -96,6 +99,12 @@ def update_contract(
     )
 
     session.commit()
+
+    if was_unsigned and contract.is_signed:
+        log_contract_signed(
+            contract_id=contract.id_contract,
+            current_user_id=current_user.id_user,
+        )
 
     return contract
 
